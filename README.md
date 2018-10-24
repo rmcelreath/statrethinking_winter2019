@@ -7,6 +7,8 @@ Instructor: Richard McElreath
 
 Location: Max Planck Institute for Evolutionary Anthropology, 4th floor seminar room
 
+When: 10am-11am Mondays & Fridays (see calendar below)
+
 Text: Statistical Rethinking, 1st ed and 2nd ed draft chapters <http://xcelab.net/rm/statistical-rethinking/>
 
 Materials: Located in this repository
