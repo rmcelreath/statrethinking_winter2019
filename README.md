@@ -1,7 +1,7 @@
 Statistical Rethinking: A Bayesian Course Using R and Stan
 ===============
 
-Winter 2018
+Winter 2018/2019
 
 Instructor: Richard McElreath
 
@@ -11,7 +11,26 @@ When: 10am-11am Mondays & Fridays (see calendar below)
 
 Text: Statistical Rethinking, 1st ed and 2nd ed draft chapters <http://xcelab.net/rm/statistical-rethinking/>
 
-Materials: Located in this repository
+# Materials
+
+## R package
+We'll use the Experimental (development) branch of my R package, because it has new features to go with the new course notes. First, you need to install `rstan`. Go to <http://mc-stan.org/> and find the instructions for your platform. Then you can install the `rethinking` package:
+```
+install.packages(c("devtools","mvtnorm","loo","coda"),dependencies=TRUE)
+library(devtools)
+install_github("rmcelreath/rethinking",ref="Experimental")
+```
+The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
+
+## Draft chapters
+We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <http://xcelab.net/rm/sr2/>.
+
+## Homework and solutions
+I will also post problem sets and solutions here.
+
+## Lectures
+
+I will add links to slides and videos in the calendar below. The slides will be posted here: <https://speakerdeck.com/rmcelreath>. The videos will be here: <https://www.youtube.com/channel/UCNJK6_DZvcMqNSzQdEkzvzA/videos>.
 
 # Calendar & Topical Outline
 
