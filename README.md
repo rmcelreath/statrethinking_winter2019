@@ -30,12 +30,13 @@ I will also post problem sets and solutions here.
 
 ## Lectures
 
-I will add links to slides and videos in the calendar below. The slides will be posted here: <https://speakerdeck.com/rmcelreath>. The videos will be here: <https://www.youtube.com/channel/UCNJK6_DZvcMqNSzQdEkzvzA/videos>.
+I will add links to slides and videos in the calendar below. The slides will be posted here: <https://speakerdeck.com/rmcelreath>. The videos will be here: <https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI>.
 
 # Calendar & Topical Outline
 
-Dec 3/7:
-The Golem of Prague (Modeling and probability theory)  
+Week 1:  
+Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
+Dec 7: Garden of Forking Data
 
 Dec 10/14:
 Geocentric Models (Regression 1)
