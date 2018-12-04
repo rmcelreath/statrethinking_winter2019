@@ -22,6 +22,8 @@ install_github("rmcelreath/rethinking",ref="Experimental")
 ```
 The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
 
+You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
+
 ## Draft chapters
 We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <http://xcelab.net/rm/sr2/>.
 
