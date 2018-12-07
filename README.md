@@ -38,7 +38,7 @@ I will add links to slides and videos in the calendar below. The slides will be 
 
 Week 1:  
 Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
-Dec 7: Garden of Forking Data
+Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <video coming>
 
 Dec 10/14:
 Geocentric Models (Regression 1)
