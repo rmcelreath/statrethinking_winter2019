@@ -28,7 +28,7 @@ You can also run everything from the RStudio Cloud in your web browser. This is 
 We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <http://xcelab.net/rm/sr2/>.
 
 ## Homework and solutions
-I will also post problem sets and solutions here.
+I will also post problem sets and solutions here. Check the folders at the top.
 
 ## Lectures
 
@@ -38,10 +38,10 @@ I will add links to slides and videos in the calendar below. The slides will be 
 
 Week 1:  
 Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
-Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <video coming>
+Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=XoVtOAN0htU&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI&index=2)>
 
-Dec 10/14:
-Geocentric Models (Regression 1)
+Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)>
+Dec 14: 
 
 Jan 7/11:
 Spurious Waffles & Causal Terror (Regression 2)
