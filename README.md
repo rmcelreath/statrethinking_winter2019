@@ -9,7 +9,7 @@ Location: Max Planck Institute for Evolutionary Anthropology, 4th floor seminar 
 
 When: 10am-11am Mondays & Fridays (see calendar below)
 
-Text: Statistical Rethinking, 1st ed and 2nd ed draft chapters <http://xcelab.net/rm/statistical-rethinking/>
+Text: Statistical Rethinking, 1st ed and 2nd ed draft chapters <https://xcelab.net/rm/statistical-rethinking/>
 
 # Materials
 
@@ -25,7 +25,7 @@ The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experi
 You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
 
 ## Draft chapters
-We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <http://xcelab.net/rm/sr2/>.
+We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <https://xcelab.net/rm/sr2/>.
 
 ## Homework and solutions
 I will also post problem sets and solutions here. Check the folders at the top.
@@ -43,8 +43,8 @@ Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-s
 Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)> <[video](https://youtu.be/h5aPo5wXN8E)>  
 Dec 14: Wiggly Orbits <[slides](https://speakerdeck.com/rmcelreath/l04-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ENxTrFf9a7c)>  
 
-Jan 7/11:
-Spurious Waffles & Causal Terror (Regression 2)
+Jan 7: Spurious Waffles <[slides](https://speakerdeck.com/rmcelreath/l05-statistical-rethinking-winter-2019)> [video]  
+Jan 11: Haunted DAG [slides] [video]
 
 Jan 14/18:
 Ulysses Compass (Overfitting and information criteria)
