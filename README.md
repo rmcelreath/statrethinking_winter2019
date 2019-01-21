@@ -49,8 +49,8 @@ I will add links to slides and videos in the calendar below. The slides will be 
 07-Jan 14: Ulysses' Compass <[slides](https://speakerdeck.com/rmcelreath/l07-statistical-rethinking-winter-2019)> <[video](https://youtu.be/0Jc6Kgw5qc0)>  
 08-Jan 18: Model Comparison <[slides](https://speakerdeck.com/rmcelreath/l08-statistical-rethinking-winter-2019)> <[video](https://youtu.be/gjrsYDJbRh0)>  
 
-Jan 21/25:
-Conditional Manatees (Interactions)
+09-Jan 21: Conditional Manatees <[slides](https://speakerdeck.com/rmcelreath/l09-statistical-rethinking-winter-2019)> [video]  
+10-Jan 25: MCMC  
 
 Jan 28/Feb 1:
 Markov chain Monte Carlo / Maximum entropy & GLMs
