@@ -49,20 +49,21 @@ I will add links to slides and videos in the calendar below. The slides will be 
 07-Jan 14: Ulysses' Compass <[slides](https://speakerdeck.com/rmcelreath/l07-statistical-rethinking-winter-2019)> <[video](https://youtu.be/0Jc6Kgw5qc0)>  
 08-Jan 18: Model Comparison <[slides](https://speakerdeck.com/rmcelreath/l08-statistical-rethinking-winter-2019)> <[video](https://youtu.be/gjrsYDJbRh0)>  
 
-09-Jan 21: Conditional Manatees <[slides](https://speakerdeck.com/rmcelreath/l09-statistical-rethinking-winter-2019)> [video]  
-10-Jan 25: MCMC  
+09-Jan 21: Conditional Manatees <[slides](https://speakerdeck.com/rmcelreath/l09-statistical-rethinking-winter-2019)> <[video](https://youtu.be/QhHfo6-Bx8o)>  
+10-Jan 25: Markov Chain Monte Carlo  
 
-Jan 28/Feb 1:
-Markov chain Monte Carlo / Maximum entropy & GLMs
+11-Jan 28: Maximum entropy & GLMs  
+12-Feb 01: More GLMs  
 
-Feb 4/8:
-Generalized Linear Models
+13-Feb 04: More GLMs  
+14-Feb 08: Models with Memory (Multilevel models 1)  
 
-Feb 11/15:
-Models with Memory (Multilevel models 1)
+15-Feb 11: More multilevel models  
+16-Feb 15: Adventures in Covariance  
 
-Feb 18/22:
-Adventures in Covariance (Multilevel models 2)
+17-Feb 18: Gaussian processes  
+18-Feb 22: Instruments and front doors  
 
-Feb 25/Mar 1:
-Missing Values & Measurement Error / Generalized Linear Madness (models beyond the GLM(M) framework)
+19-Feb 25: Missing Values and Measurement Error  
+20-Mar 01: Generalized Linear Madness (models beyond the GLM(M) framework)  
+
