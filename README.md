@@ -25,7 +25,7 @@ The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experi
 You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
 
 ## Draft chapters
-We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. If you have the password that I give out in lecture (attend class or watch the lectures), you can download them at this link: <https://xcelab.net/rm/sr2/>.
+We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. You can download them at this link: <https://xcelab.net/rm/sr2/>. The password is at the end of the 2nd lecture (linked below).
 
 ## Homework and solutions
 I will also post problem sets and solutions here. Check the folders at the top.
