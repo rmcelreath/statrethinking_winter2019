@@ -53,9 +53,9 @@ I will add links to slides and videos in the calendar below. The slides will be 
 10-Jan 25: Markov Chain Monte Carlo <[slides](https://speakerdeck.com/rmcelreath/l10-statistical-rethinking-winter-2019)> <[video](https://youtu.be/v-j0UmWf3Us)>  
 
 11-Jan 28: Maximum entropy & GLMs <[slides](https://speakerdeck.com/rmcelreath/l11-statistical-rethinking-winter-2019)> <[video](https://youtu.be/-4y4X8ELcEM)>  
-12-Feb 01: God Spiked the Integers (binomial & Poisson GLMs) <[slides](https://speakerdeck.com/rmcelreath/l12-statistical-rethinking-winter-2019)> [video]  
+12-Feb 01: God Spiked the Integers (binomial & Poisson GLMs) <[slides](https://speakerdeck.com/rmcelreath/l12-statistical-rethinking-winter-2019)> <[video](https://youtu.be/hRJtKCIDTwc)>  
 
-13-Feb 04: More GLMs  
+13-Feb 04: Survival & Categories  
 14-Feb 08: Models with Memory (Multilevel models 1)  
 
 15-Feb 11: More multilevel models  
