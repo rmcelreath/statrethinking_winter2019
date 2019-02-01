@@ -5,7 +5,7 @@ Winter 2018/2019
 
 Instructor: Richard McElreath
 
-Location: Max Planck Institute for Evolutionary Anthropology, 4th floor seminar room
+Location: Max Planck Institute for Evolutionary Anthropology, main seminar room
 
 When: 10am-11am Mondays & Fridays (see calendar below)
 
