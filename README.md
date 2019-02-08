@@ -56,7 +56,7 @@ I will add links to slides and videos in the calendar below. The slides will be 
 12-Feb 01: God Spiked the Integers (binomial & Poisson GLMs) <[slides](https://speakerdeck.com/rmcelreath/l12-statistical-rethinking-winter-2019)> <[video](https://youtu.be/hRJtKCIDTwc)>  
 
 13-Feb 04: Monsters & Mixtures (Poisson GLMs, survival, zero-inflation) <[slides](https://speakerdeck.com/rmcelreath/l13-statistical-rethinking-winter-2019)> <[video](https://youtu.be/p7g-CgGCS34)>  
-14-Feb 08: Ordered categories [slides] [video]  
+14-Feb 08: Ordered Categories, Left & Right <[slides](https://speakerdeck.com/rmcelreath/l14-statistical-rethinking-winter-2019)> [video]  
 
 15-Feb 11: Multilevel models  
 16-Feb 15: Adventures in Covariance  
