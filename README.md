@@ -22,7 +22,7 @@ install_github("rmcelreath/rethinking",ref="Experimental")
 ```
 The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
 
-You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
+(RStudio Cloud seems to be broken, because of memory limits and rstan 2.18 needing more memory. Once there is a fix, I'll post the link.) You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
 
 ## Draft chapters
 We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. You can download them at this link: <https://xcelab.net/rm/sr2/>. The password is at the end of the 2nd lecture (linked below).
@@ -62,7 +62,7 @@ I will add links to slides and videos in the calendar below. The slides will be 
 16-Feb 15: Multilevel Models 2 <[slides](https://speakerdeck.com/rmcelreath/l16-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ZG3Oe35R5sY)>  
 
 17-Feb 18: Adventures in Covariance <[slides](https://speakerdeck.com/rmcelreath/l17-statistical-rethinking-winter-2019)> <[video](https://youtu.be/yfXpjmWgyXU)>  
-18-Feb 22: Instruments and Other Doors  
+18-Feb 22: Instruments and Other Doors <[slides](https://speakerdeck.com/rmcelreath/l18-statistical-rethinking-winter-2019)> [video]  
 
 19-Feb 25: Gaussian Processes  
 20-Mar 01: Missing Values and Measurement Error  
