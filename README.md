@@ -62,7 +62,7 @@ I will add links to slides and videos in the calendar below. The slides will be 
 16-Feb 15: Multilevel Models 2 <[slides](https://speakerdeck.com/rmcelreath/l16-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ZG3Oe35R5sY)>  
 
 17-Feb 18: Adventures in Covariance <[slides](https://speakerdeck.com/rmcelreath/l17-statistical-rethinking-winter-2019)> <[video](https://youtu.be/yfXpjmWgyXU)>  
-18-Feb 22: Instruments and Other Doors <[slides](https://speakerdeck.com/rmcelreath/l18-statistical-rethinking-winter-2019)> [video]  
+18-Feb 22: Slopes, Instruments and Social Relations <[slides](https://speakerdeck.com/rmcelreath/l18-statistical-rethinking-winter-2019)> <[video](https://youtu.be/e5cgiAGBKzI)>  
 
 19-Feb 25: Gaussian Processes  
 20-Mar 01: Missing Values and Measurement Error  
