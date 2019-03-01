@@ -22,8 +22,6 @@ install_github("rmcelreath/rethinking",ref="Experimental")
 ```
 The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
 
-(RStudio Cloud seems to be broken, because of memory limits and rstan 2.18 needing more memory. Once there is a fix, I'll post the link.) You can also run everything from the RStudio Cloud in your web browser. This is up-to-date with rethinking 1.80 and rstan 2.17.3 (as of 4 Dec 2018): <https://rstudio.cloud/project/56157>
-
 ## Draft chapters
 We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. You can download them at this link: <https://xcelab.net/rm/sr2/>. The password is at the end of the 2nd lecture (linked below).
 
@@ -32,7 +30,7 @@ I will also post problem sets and solutions here. Check the folders at the top.
 
 ## Lectures
 
-I will add links to slides and videos in the calendar below. The slides will be posted here: <https://speakerdeck.com/rmcelreath>. The videos will be here: <https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI>.
+Links to slides and videos are in the calendar below. The full lecture video playlist is here: <[Statistical Rethinking 2019](https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>.
 
 # Calendar & Topical Outline
 
