@@ -9,8 +9,6 @@ Location: Max Planck Institute for Evolutionary Anthropology, main seminar room
 
 When: 10am-11am Mondays & Fridays (see calendar below)
 
-Text: Statistical Rethinking, 1st ed and 2nd ed draft chapters <https://xcelab.net/rm/statistical-rethinking/>
-
 # Materials
 
 ## R package
