@@ -56,6 +56,25 @@ Finally, since github sometimes has issues rendering `Jupyter` notebooks, you ca
 
 [Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
+[Week 2 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w02.ipynb):
+
+[Week 3 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w03.ipynb):
+
+[Week 4 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w04.ipynb):
+
+[Week 5 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w05.ipynb):
+
+[Week 6 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w06.ipynb):
+
+[Week 7 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w07.ipynb):
+
+[Week 8 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w08.ipynb):
+
+[Week 9 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w09.ipynb):
+
+[Week 10 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w10.ipynb):
+
+
 03-Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)> <[video](https://youtu.be/h5aPo5wXN8E)>  
 04-Dec 14: Wiggly Orbits <[slides](https://speakerdeck.com/rmcelreath/l04-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ENxTrFf9a7c)>  
 
