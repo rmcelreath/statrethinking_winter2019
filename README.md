@@ -1,7 +1,7 @@
 Statistical Rethinking: A Bayesian Course Using python and pymc
 ===============
 
-# Intro
+## Intro
 
 Hello everybody!
 
@@ -11,7 +11,7 @@ The course contains 20 lectures structured in 10 weeks with a series of assignme
 
 I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring an generation of scientists.
 
-# How to use this repo
+## How to use this repo
 
 There are ten `jupyter` notebooks, one for each week of the course. At the beginning of each notebook there are links to the youtube videos of the lectures, the slides used and the original homework questions and answer in `R`. I have put together all the material in the notebooks so you only have to follow one document at a time. Therefore each notebook basically contains four things:
 
