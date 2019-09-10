@@ -26,7 +26,7 @@ How I would use this repo is like this:
 
 1. Go to the notebook of the week (from 1 to 10).
 2. Watch the two videos for the lectures of that week (at the very top of each notebook).
-3. Go to the original problems presented to the students (also linked at the very top of the notebook) and try to solve them on your own.
+3. Read the original problems presented to the students and try to solve them on your own (for real! try it!).
 4. Go back to the notebook and follow the exercises with the code and comments of Professor McElreath and myself.
 
 ## Technical considerations
