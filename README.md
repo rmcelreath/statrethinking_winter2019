@@ -1,4 +1,4 @@
-Statistical Rethinking: A Bayesian Course Using python and pymc
+Statistical Rethinking: A Bayesian Course Using python and pymc3
 ===============
 
 ## Intro
@@ -52,7 +52,7 @@ There are a lot of very useful resources for bayesian statistical modelling out 
 
 # Notebooks
 
-Finally, since github sometimes has issues rendering the `Jupyter` notebooks, you can find them via nbviewer in the folloing links:
+Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the folloing links:
 
 01-Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
 02-Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=XoVtOAN0htU&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI&index=2)>
