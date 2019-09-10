@@ -56,49 +56,20 @@ Finally, since github sometimes has issues rendering `Jupyter` notebooks, you ca
 
 [Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
-[Week 2 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w02.ipynb):
+[Week 2 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w02.ipynb): Geocentric Models and Wiggly Orbits
 
-[Week 3 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w03.ipynb):
+[Week 3 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w03.ipynb): Spurious Waffles and Haunted DAG
 
-[Week 4 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w04.ipynb):
+[Week 4 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w04.ipynb): Ulysses' Compass and Model Comparison
 
-[Week 5 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w05.ipynb):
+[Week 5 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w05.ipynb): Conditional Manatees and Markov Chain Monte Carlo
 
-[Week 6 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w06.ipynb):
+[Week 6 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w06.ipynb): Maximum entropy & GLMs and God Spiked the Integers (binomial & Poisson GLMs)
 
-[Week 7 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w07.ipynb):
+[Week 7 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w07.ipynb): Monsters & Mixtures (Poisson GLMs, survival, zero-inflation) and Ordered Categories, Left & Right
 
-[Week 8 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w08.ipynb):
+[Week 8 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w08.ipynb): Multilevel Models and Multilevel Models 2
 
-[Week 9 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w09.ipynb):
+[Week 9 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w09.ipynb): Adventures in Covariance and Slopes, Instruments and Social Relations
 
-[Week 10 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w10.ipynb):
-
-
-03-Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)> <[video](https://youtu.be/h5aPo5wXN8E)>  
-04-Dec 14: Wiggly Orbits <[slides](https://speakerdeck.com/rmcelreath/l04-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ENxTrFf9a7c)>  
-
-05-Jan 7: Spurious Waffles <[slides](https://speakerdeck.com/rmcelreath/l05-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=e0tO64mtYMU&index=5&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>  
-06-Jan 11: Haunted DAG <[slides](https://speakerdeck.com/rmcelreath/l06-statistical-rethinking-winter-2019)> <[video](https://youtu.be/l_7yIUqWBmE)>  
-
-07-Jan 14: Ulysses' Compass <[slides](https://speakerdeck.com/rmcelreath/l07-statistical-rethinking-winter-2019)> <[video](https://youtu.be/0Jc6Kgw5qc0)>  
-08-Jan 18: Model Comparison <[slides](https://speakerdeck.com/rmcelreath/l08-statistical-rethinking-winter-2019)> <[video](https://youtu.be/gjrsYDJbRh0)>  
-
-09-Jan 21: Conditional Manatees <[slides](https://speakerdeck.com/rmcelreath/l09-statistical-rethinking-winter-2019)> <[video](https://youtu.be/QhHfo6-Bx8o)>  
-10-Jan 25: Markov Chain Monte Carlo <[slides](https://speakerdeck.com/rmcelreath/l10-statistical-rethinking-winter-2019)> <[video](https://youtu.be/v-j0UmWf3Us)>  
-
-11-Jan 28: Maximum entropy & GLMs <[slides](https://speakerdeck.com/rmcelreath/l11-statistical-rethinking-winter-2019)> <[video](https://youtu.be/-4y4X8ELcEM)>  
-12-Feb 01: God Spiked the Integers (binomial & Poisson GLMs) <[slides](https://speakerdeck.com/rmcelreath/l12-statistical-rethinking-winter-2019)> <[video](https://youtu.be/hRJtKCIDTwc)>  
-
-13-Feb 04: Monsters & Mixtures (Poisson GLMs, survival, zero-inflation) <[slides](https://speakerdeck.com/rmcelreath/l13-statistical-rethinking-winter-2019)> <[video](https://youtu.be/p7g-CgGCS34)>  
-14-Feb 08: Ordered Categories, Left & Right <[slides](https://speakerdeck.com/rmcelreath/l14-statistical-rethinking-winter-2019)> <[video](https://youtu.be/zA3Jxv8LOrA)>  
-
-15-Feb 11: Multilevel Models <[slides](https://speakerdeck.com/rmcelreath/l15-statistical-rethinking-winter-2019)> <[video](https://youtu.be/AALYPv5xSos)>  
-16-Feb 15: Multilevel Models 2 <[slides](https://speakerdeck.com/rmcelreath/l16-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ZG3Oe35R5sY)>  
-
-17-Feb 18: Adventures in Covariance <[slides](https://speakerdeck.com/rmcelreath/l17-statistical-rethinking-winter-2019)> <[video](https://youtu.be/yfXpjmWgyXU)>  
-18-Feb 22: Slopes, Instruments and Social Relations <[slides](https://speakerdeck.com/rmcelreath/l18-statistical-rethinking-winter-2019)> <[video](https://youtu.be/e5cgiAGBKzI)>  
-
-19-Feb 25: Gaussian Processes <[slides](https://speakerdeck.com/rmcelreath/l19-statistical-rethinking-winter-2019)> <[video](https://youtu.be/pwMRbt2CbSU)>  
-20-Mar 01: Missing Values and Measurement Error <[slides](https://speakerdeck.com/rmcelreath/l20-statistical-rethinking-winter-2019)> <[video](https://youtu.be/UgLF0aLk85s)>  
-
+[Week 10 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w10.ipynb): Gaussian Processes and Missing Values and Measurement Error
