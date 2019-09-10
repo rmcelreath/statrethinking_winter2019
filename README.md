@@ -29,7 +29,7 @@ How I would use this repo is like this:
 3. Go to the original problems presented to the students (also linked at the very top of the notebook) and try to solve them on your own.
 4. Go back to the notebook and follow the exercises with the code and comments of Professor McElreath and myself.
 
-# Technical considerations
+## Technical considerations
 
 I run the `jupyter` notebooks in a fairly humble machine running `python` 3.6. All the libraries needed are always at the top of the notebook as usual. There are not that many. The usual suspects such as `pandas`, `numpy` or `matplotlib`. For the actual modelling I used `theano` and `pymc3` and for plotting mostly `altair`.
 
@@ -43,40 +43,17 @@ Once 3.7 goes wide I'll update this readme to avoid any confusion. I did use `py
 
 # Other useful resources
 
+There are a lot of very useful resources for bayesian statistical modelling out there. Specifically centered on Professor McElreath work I would mention:
+
+1. Original [repo](https://github.com/rmcelreath/statrethinking_winter2019) for the course.
+2. Original `rethinking` package [repo](https://github.com/rmcelreath/rethinking).
+3. The `pymc3` repo contains a resources [section](https://github.com/pymc-devs/resources/tree/master/Rethinking) were you can find the exercises for the first edition of the Rethinking Statistics book (the book, not the course) done in `pymc3`. It's a bit outdated but still a very good resource.
+4. A. Solomon Kurz re-wrote the whole book exercises using a great `R` package called [`brms`](https://github.com/paul-buerkner/brms). You can find this extensive and amazing work [here](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse) and [here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/). 
+
 # Notebooks
 
-Winter 2018/2019
+Finally, since github sometimes has issues rendering the `Jupyter` notebooks, you can find them via nbviewer in the folloing links:
 
-Instructor: Richard McElreath
-
-Location: Max Planck Institute for Evolutionary Anthropology, main seminar room
-
-When: 10am-11am Mondays & Fridays (see calendar below)
-
-# Materials
-
-## R package
-We'll use the Experimental (development) branch of my R package, because it has new features to go with the new course notes. First, you need to install `rstan`. Go to <http://mc-stan.org/> and find the instructions for your platform. Then you can install the `rethinking` package:
-```
-install.packages(c("devtools","mvtnorm","loo","coda"),dependencies=TRUE)
-library(devtools)
-install_github("rmcelreath/rethinking",ref="Experimental")
-```
-The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
-
-## Draft chapters
-We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. You can download them at this link: <https://xcelab.net/rm/sr2/>. The password is at the end of the 2nd lecture (linked below).
-
-## Homework and solutions
-I will also post problem sets and solutions here. Check the folders at the top.
-
-## Lectures
-
-Links to slides and videos are in the calendar below. The full lecture video playlist is here: <[Statistical Rethinking 2019](https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>.
-
-# Calendar & Topical Outline
-
- 
 01-Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
 02-Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=XoVtOAN0htU&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI&index=2)>
 
