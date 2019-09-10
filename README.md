@@ -55,6 +55,7 @@ There are a lot of very useful resources for bayesian statistical modelling out 
 Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the folloing links:
 
 [Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb)
+
 Lectures: The Golem of Prague and Garden of Forking Data
 
 03-Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)> <[video](https://youtu.be/h5aPo5wXN8E)>  
