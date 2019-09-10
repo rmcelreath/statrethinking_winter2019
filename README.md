@@ -1,5 +1,4 @@
-Statistical Rethinking:
-A Bayesian Course Using python and pymc
+Statistical Rethinking: A Bayesian Course Using python and pymc
 ===============
 
 ## Intro
