@@ -52,7 +52,7 @@ There are a lot of very useful resources for bayesian statistical modelling out 
 
 # Notebooks
 
-Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the folloing links. When you clone the repo, you can find the in the `/notebooks` folder.
+Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find the in the `/notebooks/pymc3` folder.
 
 [Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
