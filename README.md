@@ -1,65 +1,75 @@
-Statistical Rethinking: A Bayesian Course Using R and Stan
+Statistical Rethinking: A Bayesian Course Using python and pymc3
 ===============
 
-Winter 2018/2019
+## Intro
 
-Instructor: Richard McElreath
+Hello everybody!
 
-Location: Max Planck Institute for Evolutionary Anthropology, main seminar room
+This notebook contains the `python`/`pymc3` version of the Statistical Rethinking course that Professor Richard McElreath taught on the Max Planck Institute for Evolutionary Anthropology in Leipzig during the Winter of 2019/2020. The original repo for the course, from which this repo is forked, can be found [here](https://github.com/rmcelreath/statrethinking_winter2019).
 
-When: 10am-11am Mondays & Fridays (see calendar below)
+The course contains 20 lectures structured in 10 weeks with a series of assignments for each week. This homework was done using the original `rethinking` package and `ulam`, a wrapper of `rstan` for `R`. The course is an excellent introduction to bayesian modelling in general and to the Rethinking Statistics wonderful [book](https://xcelab.net/rm/statistical-rethinking/) wrote by Professor McElreath. The course is really great, entertaining, eye-opening and very instructive.
 
-# Materials
+I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring an generation of scientists.
 
-## R package
-We'll use the Experimental (development) branch of my R package, because it has new features to go with the new course notes. First, you need to install `rstan`. Go to <http://mc-stan.org/> and find the instructions for your platform. Then you can install the `rethinking` package:
+## How to use this repo
+
+There are ten `jupyter` notebooks, one for each week of the course. At the beginning of each notebook there are links to the youtube videos of the lectures, the slides used and the original homework questions and answers in `R`. I have put together all the material in the notebooks so you only have to follow one document at a time. Therefore each notebook basically contains four things:
+
+1. Original exercises proposed
+2. Original answers given by Professor McElreath. By this I mean only the text, not the code
+3. `python` code that provides solutions to the exercises
+4. Brief comments made by me on differences of implementation between `R` and `python` or tips/tricks of `pymc3` that I learned along the way
+
+Points 1. and 2. are written down in normal letters and contain minimum editing on my part to match it with my code. These sections were written by Professor McElreath and I kept them as they were in the original course. Points 3. and 4. are my humble contribution. The code is very easily identifiable and point 4. (my comments) are always written in _italics_ to be perfectly identifiable and differentiable from Professor McElreath words. I kept them to a minimum but sometimes there are things to clarify, useful tips or common mistakes.
+
+How I would use this repo is like this:
+
+1. Go to the notebook of the week (from 1 to 10).
+2. Watch the two videos for the lectures of that week (at the very top of each notebook).
+3. Read the original problems presented to the students and try to solve them on your own (for real! try it!).
+4. Follow the exercises solutions of the notebook with my code and explanations by Professor McElreath.
+
+## Technical considerations
+
+I run the `jupyter` notebooks in a fairly humble machine running `python` 3.6. All the libraries needed are always at the top of the notebook as usual. There are not that many. The usual suspects such as `pandas`, `numpy` or `matplotlib`. For the actual modelling I used `theano` and `pymc3` and for plotting mostly `altair`.
+
+The only minor detail here is that I used `pymc3` 3.7, which is the lastest version, so it could be a bit unstable (although I found no issues whatsoever). To install it just run
+
 ```
-install.packages(c("devtools","mvtnorm","loo","coda"),dependencies=TRUE)
-library(devtools)
-install_github("rmcelreath/rethinking",ref="Experimental")
+pip install git+https://github.com/pymc-devs/pymc3
 ```
-The code is all on github: <https://github.com/rmcelreath/rethinking/tree/Experimental>
 
-## Draft chapters
-We'll use draft chapters for the 2nd edition of my book, Statistical Rethinking. You can download them at this link: <https://xcelab.net/rm/sr2/>. The password is at the end of the 2nd lecture (linked below).
+Once 3.7 goes wide I'll update this readme to avoid any confusion. I did use `pymc3` 3.7 because of the new `Data` class available only from this version. I explain in detail the advantages on having the possibility of using this new class during the notebooks.
 
-## Homework and solutions
-I will also post problem sets and solutions here. Check the folders at the top.
+# Other useful resources
 
-## Lectures
+There are a lot of very useful resources for bayesian statistical modelling out there. Specifically centered on Professor McElreath work I would mention:
 
-Links to slides and videos are in the calendar below. The full lecture video playlist is here: <[Statistical Rethinking 2019](https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>.
+1. Original [repo](https://github.com/rmcelreath/statrethinking_winter2019) for the course.
+2. Original `rethinking` package [repo](https://github.com/rmcelreath/rethinking).
+3. The `pymc3` repo contains a resources [section](https://github.com/pymc-devs/resources/tree/master/Rethinking) were you can find the exercises for the first edition of the Rethinking Statistics book (the book, not the course) done in `pymc3`. It's a bit outdated but still a very good resource.
+4. A. Solomon Kurz re-wrote the whole book exercises using a great `R` package called [`brms`](https://github.com/paul-buerkner/brms). You can find this extensive and amazing work [here](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse) and [here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/). 
 
-# Calendar & Topical Outline
+# Notebooks
 
- 
-01-Dec 3: The Golem of Prague <[slides](https://speakerdeck.com/rmcelreath/l01-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=4WVelCswXo4)>  
-02-Dec 7: Garden of Forking Data <[slides](https://speakerdeck.com/rmcelreath/l02-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=XoVtOAN0htU&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI&index=2)>
+Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find the in the `/notebooks/pymc3` folder.
 
-03-Dec 10: Geocentric Models <[slides](https://speakerdeck.com/rmcelreath/l03-statistical-rethinking-winter-2019)> <[video](https://youtu.be/h5aPo5wXN8E)>  
-04-Dec 14: Wiggly Orbits <[slides](https://speakerdeck.com/rmcelreath/l04-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ENxTrFf9a7c)>  
+[Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
-05-Jan 7: Spurious Waffles <[slides](https://speakerdeck.com/rmcelreath/l05-statistical-rethinking-winter-2019)> <[video](https://www.youtube.com/watch?v=e0tO64mtYMU&index=5&list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>  
-06-Jan 11: Haunted DAG <[slides](https://speakerdeck.com/rmcelreath/l06-statistical-rethinking-winter-2019)> <[video](https://youtu.be/l_7yIUqWBmE)>  
+[Week 2 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w02.ipynb): Geocentric Models and Wiggly Orbits
 
-07-Jan 14: Ulysses' Compass <[slides](https://speakerdeck.com/rmcelreath/l07-statistical-rethinking-winter-2019)> <[video](https://youtu.be/0Jc6Kgw5qc0)>  
-08-Jan 18: Model Comparison <[slides](https://speakerdeck.com/rmcelreath/l08-statistical-rethinking-winter-2019)> <[video](https://youtu.be/gjrsYDJbRh0)>  
+[Week 3 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w03.ipynb): Spurious Waffles and Haunted DAG
 
-09-Jan 21: Conditional Manatees <[slides](https://speakerdeck.com/rmcelreath/l09-statistical-rethinking-winter-2019)> <[video](https://youtu.be/QhHfo6-Bx8o)>  
-10-Jan 25: Markov Chain Monte Carlo <[slides](https://speakerdeck.com/rmcelreath/l10-statistical-rethinking-winter-2019)> <[video](https://youtu.be/v-j0UmWf3Us)>  
+[Week 4 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w04.ipynb): Ulysses' Compass and Model Comparison
 
-11-Jan 28: Maximum entropy & GLMs <[slides](https://speakerdeck.com/rmcelreath/l11-statistical-rethinking-winter-2019)> <[video](https://youtu.be/-4y4X8ELcEM)>  
-12-Feb 01: God Spiked the Integers (binomial & Poisson GLMs) <[slides](https://speakerdeck.com/rmcelreath/l12-statistical-rethinking-winter-2019)> <[video](https://youtu.be/hRJtKCIDTwc)>  
+[Week 5 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w05.ipynb): Conditional Manatees and Markov Chain Monte Carlo
 
-13-Feb 04: Monsters & Mixtures (Poisson GLMs, survival, zero-inflation) <[slides](https://speakerdeck.com/rmcelreath/l13-statistical-rethinking-winter-2019)> <[video](https://youtu.be/p7g-CgGCS34)>  
-14-Feb 08: Ordered Categories, Left & Right <[slides](https://speakerdeck.com/rmcelreath/l14-statistical-rethinking-winter-2019)> <[video](https://youtu.be/zA3Jxv8LOrA)>  
+[Week 6 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w06.ipynb): Maximum entropy & GLMs and God Spiked the Integers (binomial & Poisson GLMs)
 
-15-Feb 11: Multilevel Models <[slides](https://speakerdeck.com/rmcelreath/l15-statistical-rethinking-winter-2019)> <[video](https://youtu.be/AALYPv5xSos)>  
-16-Feb 15: Multilevel Models 2 <[slides](https://speakerdeck.com/rmcelreath/l16-statistical-rethinking-winter-2019)> <[video](https://youtu.be/ZG3Oe35R5sY)>  
+[Week 7 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w07.ipynb): Monsters & Mixtures (Poisson GLMs, survival, zero-inflation) and Ordered Categories, Left & Right
 
-17-Feb 18: Adventures in Covariance <[slides](https://speakerdeck.com/rmcelreath/l17-statistical-rethinking-winter-2019)> <[video](https://youtu.be/yfXpjmWgyXU)>  
-18-Feb 22: Slopes, Instruments and Social Relations <[slides](https://speakerdeck.com/rmcelreath/l18-statistical-rethinking-winter-2019)> <[video](https://youtu.be/e5cgiAGBKzI)>  
+[Week 8 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w08.ipynb): Multilevel Models and Multilevel Models 2
 
-19-Feb 25: Gaussian Processes <[slides](https://speakerdeck.com/rmcelreath/l19-statistical-rethinking-winter-2019)> <[video](https://youtu.be/pwMRbt2CbSU)>  
-20-Mar 01: Missing Values and Measurement Error <[slides](https://speakerdeck.com/rmcelreath/l20-statistical-rethinking-winter-2019)> <[video](https://youtu.be/UgLF0aLk85s)>  
+[Week 9 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w09.ipynb): Adventures in Covariance and Slopes, Instruments and Social Relations
 
+[Week 10 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w10.ipynb): Gaussian Processes and Missing Values and Measurement Error
