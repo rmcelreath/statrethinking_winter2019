@@ -13,7 +13,7 @@ I started to watch the lectures and do the homework but since I tend to prefer `
 
 ## How to use this repo
 
-There are ten `jupyter` notebooks, one for each week of the course. At the beginning of each notebook there are links to the youtube videos of the lectures, the slides used and the original homework questions and answer in `R`. I have put together all the material in the notebooks so you only have to follow one document at a time. Therefore each notebook basically contains four things:
+There are ten `jupyter` notebooks, one for each week of the course. At the beginning of each notebook there are links to the youtube videos of the lectures, the slides used and the original homework questions and answers in `R`. I have put together all the material in the notebooks so you only have to follow one document at a time. Therefore each notebook basically contains four things:
 
 1. Original exercises proposed
 2. Original answers given by Professor McElreath. By this I mean only the text, not the code
