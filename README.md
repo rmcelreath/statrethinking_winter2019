@@ -9,7 +9,7 @@ This notebook contains the `python`/`pymc3` version of the Statistical Rethinkin
 
 The course contains 20 lectures structured in 10 weeks with a series of assignments for each week. This homework was done using the original `rethinking` package and `ulam`, a wrapper of `rstan` for `R`. The course is an excellent introduction to bayesian modelling in general and to the Rethinking Statistics wonderful [book](https://xcelab.net/rm/statistical-rethinking/) wrote by Professor McElreath. The course is really great, entertaining, eye-opening and very instructive.
 
-I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring an generation of scientists.
+I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring a generation of scientists.
 
 ## How to use this repo
 
