@@ -41,7 +41,7 @@ pip install git+https://github.com/pymc-devs/pymc3
 
 Once 3.7 goes wide I'll update this readme to avoid any confusion. I did use `pymc3` 3.7 because of the new `Data` class available only from this version. I explain in detail the advantages on having the possibility of using this new class during the notebooks.
 
-# Other useful resources
+## Other useful resources
 
 There are a lot of very useful resources for bayesian statistical modelling out there. Specifically centered on Professor McElreath work I would mention:
 
@@ -50,7 +50,7 @@ There are a lot of very useful resources for bayesian statistical modelling out 
 3. The `pymc3` repo contains a resources [section](https://github.com/pymc-devs/resources/tree/master/Rethinking) where you can find the exercises for the first edition of the Rethinking Statistics book (the book, not the course) done in `pymc3`. It's a bit outdated but still a very good resource.
 4. A. Solomon Kurz re-wrote the whole book exercises using a great `R` package called [`brms`](https://github.com/paul-buerkner/brms). You can find this extensive and amazing work [here](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse) and [here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/). 
 
-# Notebooks
+## Notebooks
 
 Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find the in the `/notebooks/pymc3` folder.
 
