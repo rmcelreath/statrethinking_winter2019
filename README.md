@@ -7,9 +7,9 @@ Hello everybody!
 
 This notebook contains the `python`/`pymc3` version of the Statistical Rethinking course that Professor Richard McElreath taught on the Max Planck Institute for Evolutionary Anthropology in Leipzig during the Winter of 2019/2020. The original repo for the course, from which this repo is forked, can be found [here](https://github.com/rmcelreath/statrethinking_winter2019).
 
-The course contains 20 lectures structured in 10 weeks with a series of assignments for each week. This homework was done using the original `rethinking` package and `ulam`, a wrapper of `rstan` for `R`. The course is an excellent introduction to bayesian modelling in general and to the Rethinking Statistics wonderful [book](https://xcelab.net/rm/statistical-rethinking/) wrote by Professor McElreath. The course is really great, entertaining, eye-opening and very instructive.
+The course contains 20 lectures structured in 10 weeks with a series of assignments for each week. This homework was done using the original `rethinking` package and `ulam`, a wrapper of `rstan` for `R`. The course is an excellent introduction to bayesian modelling in general and to the Rethinking Statistics wonderful [book](https://xcelab.net/rm/statistical-rethinking/) written by Professor McElreath. The course is really great, entertaining, eye-opening and very instructive.
 
-I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring an generation of scientists.
+I started to watch the lectures and do the homework but since I tend to prefer `python` to `R` I also started to re-do all the homework using `pymc3`, a popular `python` library for bayesian modelling that uses `theano` as backend. After I finished the course I thought I should make public the `jupyter` notebooks, just in case somebody finds them useful. This repo is a love-letter to the course that I have enjoyed so very much and to the work of Professor McElreath. Thank you Richard for inspiring a generation of scientists.
 
 ## How to use this repo
 
@@ -41,18 +41,18 @@ pip install git+https://github.com/pymc-devs/pymc3
 
 Once 3.7 goes wide I'll update this readme to avoid any confusion. I did use `pymc3` 3.7 because of the new `Data` class available only from this version. I explain in detail the advantages on having the possibility of using this new class during the notebooks.
 
-# Other useful resources
+## Other useful resources
 
 There are a lot of very useful resources for bayesian statistical modelling out there. Specifically centered on Professor McElreath work I would mention:
 
 1. Original [repo](https://github.com/rmcelreath/statrethinking_winter2019) for the course.
 2. Original `rethinking` package [repo](https://github.com/rmcelreath/rethinking).
-3. The `pymc3` repo contains a resources [section](https://github.com/pymc-devs/resources/tree/master/Rethinking) were you can find the exercises for the first edition of the Rethinking Statistics book (the book, not the course) done in `pymc3`. It's a bit outdated but still a very good resource.
+3. The `pymc3` repo contains a resources [section](https://github.com/pymc-devs/resources/tree/master/Rethinking) where you can find the exercises for the first edition of the Rethinking Statistics book (the book, not the course) done in `pymc3`. It's a bit outdated but still a very good resource.
 4. A. Solomon Kurz re-wrote the whole book exercises using a great `R` package called [`brms`](https://github.com/paul-buerkner/brms). You can find this extensive and amazing work [here](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse) and [here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/). 
 
-# Notebooks
+## Notebooks
 
-Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find the in the `/notebooks/pymc3` folder.
+Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find them in the `/notebooks/pymc3` folder.
 
 [Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
