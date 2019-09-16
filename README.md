@@ -28,7 +28,7 @@ I will also post problem sets and solutions here. Check the folders at the top.
 
 ## Lectures
 
-Links to slides and videos are in the calendar below. The full lecture video playlist is here: <[Statistical Rethinking 2019](https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>.
+Links to slides and videos are in the calendar below. The full lecture video playlist is here: <[Statistical Rethinking 2019](https://www.youtube.com/playlist?list=PLDcUM9US4XdNM4Edgs7weiyIguLSToZRI)>. The course examples in R have been converted to <[Python/pyMC3](https://github.com/gbosquechacon/statrethink_course_in_pymc3)> as well.
 
 # Calendar & Topical Outline
 
