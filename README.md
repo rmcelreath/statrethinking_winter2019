@@ -5,7 +5,7 @@ Statistical Rethinking: A Bayesian Course Using python and pymc3
 
 Hello everybody!
 
-This notebook contains the `python`/`pymc3` version of the Statistical Rethinking course that Professor Richard McElreath taught on the Max Planck Institute for Evolutionary Anthropology in Leipzig during the Winter of 2019/2020. The original repo for the course, from which this repo is forked, can be found [here](https://github.com/rmcelreath/statrethinking_winter2019).
+This repo contains the `python`/`pymc3` version of the Statistical Rethinking course that Professor Richard McElreath taught on the Max Planck Institute for Evolutionary Anthropology in Leipzig during the Winter of 2019/2020. The original repo for the course, from which this repo is forked, can be found [here](https://github.com/rmcelreath/statrethinking_winter2019).
 
 The course contains 20 lectures structured in 10 weeks with a series of assignments for each week. This homework was done using the original `rethinking` package and `ulam`, a wrapper of `rstan` for `R`. The course is an excellent introduction to bayesian modelling in general and to the Rethinking Statistics wonderful [book](https://xcelab.net/rm/statistical-rethinking/) written by Professor McElreath. The course is really great, entertaining, eye-opening and very instructive.
 
