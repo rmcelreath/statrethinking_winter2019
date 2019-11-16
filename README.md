@@ -31,15 +31,7 @@ How I would use this repo is like this:
 
 ## Technical considerations
 
-I run the `jupyter` notebooks in a fairly humble machine running `python` 3.6. All the libraries needed are always at the top of the notebook as usual. There are not that many. The usual suspects such as `pandas`, `numpy` or `matplotlib`. For the actual modelling I used `theano` and `pymc3` and for plotting mostly `altair`.
-
-The only minor detail here is that I used `pymc3` 3.7, which is the lastest version, so it could be a bit unstable (although I found no issues whatsoever). To install it just run
-
-```
-pip install git+https://github.com/pymc-devs/pymc3
-```
-
-Once 3.7 goes wide I'll update this readme to avoid any confusion. I did use `pymc3` 3.7 because of the new `Data` class available only from this version. I explain in detail the advantages on having the possibility of using this new class during the notebooks.
+I run the `jupyter` notebooks in a fairly humble machine running `python` 3.6. All the libraries needed are always at the top of the notebook as usual. There are not that many. The usual suspects such as `pandas`, `numpy` or `matplotlib`. For the actual modelling I used `theano` and `pymc3` and for plotting mostly `altair`. I used `pymc3` 3.7, which is the lastest version. I did use `pymc3` 3.7 because of the new `Data` class available only from this version. I explain in detail the advantages on having the possibility of using this new class in one of the notebooks.
 
 ## Other useful resources
 
