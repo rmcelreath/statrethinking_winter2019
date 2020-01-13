@@ -1,0 +1,40 @@
+{
+  "R": {
+    "Version": "3.6.0",
+    "Repositories": [
+      {
+        "Name": "CRAN",
+        "URL": "https://cran.rstudio.com"
+      },
+      {
+        "Name": "rvcran",
+        "URL": "https://data-science-read:AKCp5ccb3kdWDAHSq4uG6iTHCmjC4yTzsaPH2ot2YTLvRXi6zwLWGj9PQGeZMPFA8R4UC6Kx6@redventures.jfrog.io/redventures/rv-cran"
+      }
+    ]
+  },
+  "Bioconductor": {
+    "Repositories": [
+      {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.9/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.9/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.9/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.9/workflows"
+      },
+      {
+        "Name": "CRAN",
+        "URL": "https://cran.rstudio.com"
+      }
+    ]
+  },
+  "Packages": {}
+}

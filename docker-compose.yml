@@ -1,0 +1,25 @@
+version: '3'
+services:
+  statrethinking_winter2019-rstudio-server:
+    container_name: statrethinking_winter2019-rstudio-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: statrethinking_winter2019-rstudio-server-image
+    ports:
+      - 8787:8787
+    volumes:
+      - .:/home/rstudio/statrethinking_winter2019
+      - ~/Library/ApplicationSupport/renv:/home/rstudio/.local/share/renv
+    working_dir: /home/rstudio
+    entrypoint:
+      - /usr/lib/rstudio-server/bin/rserver
+    command:
+      - --server-daemonize=0
+      - --server-app-armor-enabled=0
+    environment: 
+      - USER=rstudio
+      - PASS=rstudio
+    stdin_open: true
+    tty: true
+    restart: always
