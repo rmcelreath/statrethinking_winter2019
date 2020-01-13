@@ -1,0 +1,179 @@
+---
+title: "Chapter 2 Practice"
+author: "Keith Williams"
+date: "1/13/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Medium  
+
+### 2M1
+
+```{r}
+grid_approximate_posterior <- function(f_prior, observations, grid_size = 1000) {
+  probability_grid <- seq(0, 1, length.out = grid_size)
+  prior <- purrr::map_dbl(probability_grid, f_prior)
+  successes <- sum(observations == "W")
+  n_trials <- length(observations)
+  likelihood <- dbinom(successes, size = n_trials, prob = probability_grid)
+  posterior <- likelihood * prior
+  tibble(
+    parameter_estimate = probability_grid,
+    density = posterior / sum(posterior)
+  )
+}
+
+uniform_prior <- function(p) {1}
+
+plot_posterior <- function(posterior) {
+  ggplot(posterior, aes(parameter_estimate, density)) + geom_line()
+}
+
+# W, W, W
+m11 <- c("W", "W", "W")
+m11_posterior <- grid_approximate_posterior(uniform_prior, m11)
+plot_posterior(m11_posterior)
+
+# W, W, W, L
+m12 <- c("W", "W", "W", "L")
+m12_posterior <- grid_approximate_posterior(uniform_prior, m12)
+plot_posterior(m12_posterior)
+
+# L, W, W, L, W, W, W
+m13 <- c("L", "W", "W", "L", "W", "W", "W")
+m13_posterior <- grid_approximate_posterior(uniform_prior, m13)
+plot_posterior(m13_posterior)
+```
+
+### 2M2
+
+```{r}
+at_least_one_in_two <- function(p) {
+  if(p < 0.5) {
+    0
+  } else {
+    1
+  }
+}
+
+grid_approximate_posterior(at_least_one_in_two, m11) %>% 
+  plot_posterior()
+
+grid_approximate_posterior(at_least_one_in_two, m12) %>% 
+  plot_posterior()
+
+grid_approximate_posterior(at_least_one_in_two, m13) %>% 
+  plot_posterior()
+```
+
+### 2M3
+
+```{r}
+pr_land_given_earth <- 1.0 - 0.70
+pr_land_given_mars <- 1.0
+pr_earth <- 0.50
+pr_mars <- 0.50
+
+(posterior_earth <- pr_land_given_earth * pr_earth / (pr_land_given_earth * pr_earth + pr_land_given_mars * pr_mars))
+```
+
+### 2M4  
+
+```{r}
+## Black Up could be B/W or B1/B2 or B2/B1
+# B/B = B1/B2 or B2/B1 out of B/W or B1/B2 or B2/B1
+```
+
+### 2M5
+
+```{r}
+pr_black_up <- 5 / 8
+pr_black_down_given_black_up <- 4 / 5
+```
+
+### 2M6
+
+```{r}
+tibble(
+  card = c("B/B", "B/W", "W/W"),
+  prior = c(1/6, 2/6, 3/6),
+  likelihood = c(2/3, 1/3, 0)
+) %>% 
+  mutate(posterior = prior * likelihood / sum(prior * likelihood))
+```
+
+### 2M7  
+
+```{r}
+# Possibilities:  
+# B1/B2, W/B  
+# B2/B1, W/B  
+# B1/B2, W1/W2  
+# B1/B2, W2/W1  
+# B2/B1, W1/W2  
+# B2/B1, W2/W1
+# B/W, W1/W2
+# B/W, W2/W1
+
+# Cases where B is down = 6/8 = 0.75
+```
+
+## Hard  
+
+### 2H1
+
+```{r}
+twin_rate_a <- 0.10  
+twin_rate_b <- 0.20
+
+p_b_given_twins <- twin_rate_b / (twin_rate_b + twin_rate_a)
+p_a_given_twins <- twin_rate_a / (twin_rate_b + twin_rate_a)
+
+# probability of second twins is the twin rate for each species weighted by the probability of being in each species
+(p_twins_given_twins <- twin_rate_a * p_a_given_twins + twin_rate_b * p_b_given_twins)
+
+# Alternatively, There are 3 in 20 ways to get twins (1/10 from A, 2/10 from B)
+# From those three events, there are 1/10 + 2/10 + 2/10 ways to get a second twin
+5 / 30
+```
+
+### 2H2  
+
+```{r}
+# of the 3 in 20 ways to get twins, 1 is of species A, 2 are of species B = 1 / 3
+p_a_given_twins
+```
+
+### 2H3
+
+```{r}
+# Observation: T, S  
+(pr_a_given_twins_singleton <- (1 - twin_rate_a) * p_a_given_twins / ((1 - twin_rate_b) * p_b_given_twins + (1 - twin_rate_a) * p_a_given_twins))
+```
+
+### 2H4  
+
+```{r}
+pr_a_given_a <- function(pr_a, pr_b) {
+  pr_a_given_a <- 0.8
+  pr_a_given_b <- 1 - 0.65
+  pr_a_given_a * pr_a / (pr_a_given_a * pr_a + pr_a_given_b * pr_b)
+}
+
+# without birth data
+pr_a_given_a(0.5, 0.5)
+
+# with a single twin
+pr_a_given_a(p_a_given_twins, p_b_given_twins)
+
+# with twin, singleton
+pr_a_given_a(pr_a_given_twins_singleton, 1 - pr_a_given_twins_singleton)
+```
+

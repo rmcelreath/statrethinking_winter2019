@@ -26,4 +26,6 @@ COPY ./renv.lock .
 RUN Rscript -e 'renv::consent(provided = TRUE);'
 RUN Rscript -e "renv::restore(library = '/usr/lib/R/site-library');"
 
+RUN apt-get install libv8-3.14-dev -y
+
 CMD ["/init"]
