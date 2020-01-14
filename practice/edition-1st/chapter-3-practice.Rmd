@@ -1,0 +1,202 @@
+---
+title: "Chapter 3 Practice"
+author: "Keith Williams"
+date: "1/13/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Easy
+
+```{r}
+p_grid <- seq(from=0, to=1, length.out=1000)
+prior <- rep(1, length(p_grid))
+likelihood <- dbinom(6, size=9, prob=p_grid)
+posterior <- likelihood * prior / sum(likelihood * prior)
+set.seed(100)
+samples <- sample(p_grid, prob = posterior, size = 1e4, replace = TRUE)
+
+ggplot() + geom_histogram(data = tibble(samples), aes(samples))
+```
+
+```{r}
+# posterior below 0.2
+mean(samples < 0.2)
+
+# posterior above 0.8
+mean(samples > 0.8)
+
+# posterior between 0.2 and 0.8
+mean(samples > 0.2 & samples < 0.8)
+
+# 20th percentile
+quantile(samples, 0.2)
+
+# top 20th percentile
+1 - quantile(samples, 0.8)
+
+# 66th HPDI
+rethinking::HPDI(samples, 0.66)
+
+# middle 66 percent  
+alpha (1 - 0.66) / 2
+quantile(samples, probs = c(alpha, 1 - alpha))
+```
+
+## Medium  
+
+### 3M1  
+
+```{r}
+likelihood_8in15 <- dbinom(8, size=15, prob = p_grid)
+posterior_8in15 <- likelihood_8in15 * prior / sum(likelihood_8in15 * prior)
+(density_plot <- ggplot(tibble(p_water = p_grid, density = posterior_8in15), aes(p_water, density)) + geom_line())
+```
+
+### 3M2
+
+```{r}
+samples_8in15 <- sample(p_grid, prob = posterior_8in15, size = 1e4, replace = TRUE)
+(hpdi_90 <- rethinking::HPDI(samples_8in15, 0.90))
+density_plot +
+  geom_vline(xintercept = hpdi_90[1], color = "red") +
+  geom_vline(xintercept = hpdi_90[2], color = "red")
+```
+
+### 3M3
+
+```{r}
+posterior_predictive_check <- tibble(
+  count_water = rbinom(1e4, size = 15, prob = samples_8in15)
+  ) %>% 
+  group_by(count_water) %>% 
+  summarise(n = n()) %>%
+  mutate(probability = n / sum(n),
+         empirically_observed = count_water == 8)
+
+ggplot(posterior_predictive_check, aes(count_water, probability, fill = empirically_observed)) +
+  geom_bar(stat = "identity")
+
+filter(posterior_predictive_check, empirically_observed)
+```
+
+### 3M4
+
+```{r}
+filter(posterior_predictive_check, count_water == 6)
+```
+
+### 3M5
+
+```{r}
+tibble(
+  p_water = p_grid,
+  likelihood = likelihood_8in15
+) %>% 
+  mutate(
+    uniform_prior = 1,
+    informed_prior = ifelse(p_water < 0.5, 0, 1),
+    uninformed_posterior = likelihood * uniform_prior / sum(likelihood * uniform_prior),
+    informed_posterior = likelihood * informed_prior / sum(likelihood * informed_prior)
+  ) %>% 
+  gather("prior", "density", uninformed_posterior, informed_posterior) %>%
+  ggplot(aes(p_water, density, color = prior)) +
+    geom_line() +
+    geom_vline(xintercept = 0.7)
+```
+
+## Hard  
+
+```{r}
+birth1 <- c(1,0,0,0,1,1,0,1,0,1,0,0,1,1,0,1,1,0,0,0,1,0,0,0,1,0,
+0,0,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1,0,1,0,0,1,1,0,1,0,0,0,0,0,0,0,
+1,1,0,1,0,0,1,0,0,0,1,0,0,1,1,1,1,0,1,0,1,1,1,1,1,0,0,1,0,1,1,0,
+1,0,1,1,1,0,1,1,1,1)
+
+birth2 <- c(0,1,0,1,0,1,1,1,0,0,1,1,1,1,1,0,0,1,1,1,0,0,1,1,1,0,
+1,1,1,0,1,1,1,0,1,0,0,1,1,1,1,0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,
+1,1,1,0,1,1,0,1,1,0,1,1,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,1,0,0,1,1,
+0,0,0,1,1,1,0,0,0,0)
+
+sum(birth1, birth2)
+```
+
+### 3H1  
+
+```{r}
+likelihood_birth <- dbinom(sum(birth1, birth2), size = length(c(birth1, birth2)), p_grid)
+posterior_birth <- likelihood_birth * prior / sum(likelihood * prior)
+
+tibble(
+  p_male = p_grid,
+  density = posterior_birth
+) %>% 
+  ggplot(aes(p_male, density)) + geom_line()
+
+p_grid[which.max(posterior_birth)]
+```
+
+### 3H2  
+
+```{r}
+sample_birth <- sample(p_grid, size = 1e4, prob = posterior_birth, replace = TRUE)
+
+rethinking::HPDI(sample_birth, 0.50)
+rethinking::HPDI(sample_birth, 0.89)
+rethinking::HPDI(sample_birth, 0.97)
+```
+
+### 3H3  
+
+```{r}
+posterior_predictive_check_birth <- tibble(
+  count_males = rbinom(1e4, size = 200, prob = sample_birth)
+  ) %>% 
+  group_by(count_males) %>% 
+  summarise(n = n()) %>%
+  mutate(probability = n / sum(n),
+         empirically_observed = count_males == sum(birth1, birth2))
+
+ggplot(posterior_predictive_check_birth, aes(count_males, probability, fill = empirically_observed)) +
+  geom_bar(stat = "identity")
+```
+
+### 3H4
+
+```{r}
+posterior_predictive_check_birth100 <- tibble(
+  count_males = rbinom(1e4, size = 100, prob = sample_birth)
+  ) %>% 
+  group_by(count_males) %>% 
+  summarise(n = n()) %>%
+  mutate(probability = n / sum(n),
+         empirically_observed = count_males == sum(birth1))
+
+ggplot(posterior_predictive_check_birth100, aes(count_males, probability, fill = empirically_observed)) +
+  geom_bar(stat = "identity")
+```
+
+### 3H5  
+
+```{r}
+births <- tibble(birth1, birth2)
+first_girls <- filter(births, birth1 == 0)
+
+posterior_predictive_check_second_born <- tibble(
+  count_males = rbinom(1e4, size = nrow(first_girls), prob = sample_birth)
+  ) %>% 
+  group_by(count_males) %>% 
+  summarise(n = n()) %>%
+  mutate(probability = n / sum(n),
+         empirically_observed = count_males == sum(first_girls$birth2))
+
+ggplot(posterior_predictive_check_second_born, aes(count_males, probability, fill = empirically_observed)) +
+  geom_bar(stat = "identity")
+```
+
+Second born males are very underestimated by assuming independence. Males are much more likely after a first female, suggesting gender is not independent.
