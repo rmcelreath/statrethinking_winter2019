@@ -1,0 +1,7 @@
+^statrethinking_winter2019\.Rproj$
+^\.Rproj\.user$
+^Dockerfile$
+^docker-compose.yml$
+^renv.lock$
+^.circleci$
+^.yo-rc.json$

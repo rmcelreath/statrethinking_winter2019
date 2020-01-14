@@ -1,0 +1,24 @@
+{
+  "generator-start-r": {
+    "promptValues": {
+      "maintainerFirstName": "Keith",
+      "maintainerLastName": "Williams"
+    },
+    "projectType": "script",
+    "projectName": "statrethinking_winter2019",
+    "projectDescription": "dev-env-for-stat-rethinking",
+    "projectVersion": "0.0.0.9000",
+    "projectUrl": "https://github.com/keithgw/statrethinking_winter2019",
+    "rVersion": "3.6.0",
+    "renvVersion": "0.7.1-20",
+    "renvCachePath": "~/Library/ApplicationSupport/renv",
+    "baseImage": "rocker/tidyverse",
+    "orgName": "keithgw",
+    "orgURL": "na",
+    "orgDepartment": "me",
+    "maintainerFirstName": "Keith",
+    "maintainerLastName": "Williams",
+    "maintainerName": "Keith Williams",
+    "maintainerEmail": "kwilliams@redventures.com"
+  }
+}
