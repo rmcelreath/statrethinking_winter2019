@@ -1,0 +1,254 @@
+---
+title: "Chapter 4 Practice"
+author: "Keith Williams"
+date: "1/14/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+# Notes  
+
+```{r}
+approximate_normal <- function(vec, grid_size = 100) {
+  tibble(grid = seq(min(vec), max(vec), length.out = grid_size)) %>% 
+    mutate(density = dnorm(grid, mean = mean(vec), sd = sd(vec)))
+}
+
+growth <- replicate(1e4, prod(1 + runif(12, 0, 0.1)))
+approximation <- approximate_normal(growth) %>% 
+  rename(growth = grid)
+
+ggplot() + 
+  geom_density(data = tibble(growth), aes(growth)) +
+  geom_line(data = approximation, aes(growth, density), color = "red")
+  
+```
+
+```{r}
+log_products <- replicate(1e4, log(prod(1 + runif(12, 0, 0.5))))
+approximation_log <- approximate_normal(log_products) %>% 
+  rename(log_products = grid)
+
+ggplot() +
+  geom_density(data = tibble(log_products), aes(log_products)) + 
+  geom_line(data = approximation_log, aes(log_products, density), color = "red")
+```
+
+# Practice  
+
+## Easy  
+
+### 4E3
+
+$$y_i \sim \mathcal{N}(\mu, \sigma)$$  
+$$\mu \sim \mathcal{N}(0, 10)$$  
+$$\sigma \sim \mathcal{U}(0, 10)$$  
+$$P(\mu, \sigma | y) = \frac{\prod_{i}\mathcal{N}(\mu, \sigma)\mathcal{N}(0, 10)\mathcal{U}(0, 10)}{\int\int\prod_{i}\mathcal{N}(\mu, \sigma)\mathcal{N}(0, 10)\mathcal{U}(0, 10)d\mu d\sigma}$$  
+
+## Medium  
+
+### 4M1  
+
+```{r}
+n <- 1e4
+tibble(
+  mu = rnorm(n, 0, 10),
+  sigma = runif(n, 0, 10)
+) %>% 
+  mutate(height = map2_dbl(mu, sigma, ~rnorm(1, .x, .y))) %>% 
+  ggplot(aes(height)) + 
+  geom_density()
+```
+
+### 4M2  
+
+```{r}
+flist_m2 <- alist(
+  y ~ dnorm(mu, sigma),
+  mu <- dnorm(0, 10),
+  sigma <- dnorm(0, 10)
+)
+```
+
+### 4M3  
+
+$$y_i \sim \mathcal{N}(\mu_i, \sigma)$$  
+$$\mu_i = \alpha + \beta x_i$$
+$$\alpha \sim \mathcal{N}(0, 50)$$  
+$$\beta \sim \mathcal{U}(0, 10)$$  
+$$\sigma \sim \mathcal{U}(0, 50)$$  
+
+### 4M4  
+
+Height is in units of feet.
+
+$$h_i \sim \mathcal{N}(\mu_i, \sigma)$$  
+
+$$\mu_i = \alpha + \beta x_i$$  
+$$\alpha \sim \mathcal{N}(5.5, 2)$$  
+$$\beta \sim \mathcal{N}(0, 1)$$  
+$$\sigma \sim \mathcal{U}(0, 2)$$  
+
+### 4M5  
+
+Might change the prior on $\mu$ to have mean 120, and change the distribution on $\beta$ to be log-normal, so that it could only take on positive values.  
+
+### 4M6  
+
+change the bounds on sigma to be 0 and $\sqrt{64}$ cm.  
+
+## Hard  
+
+### 4H1  
+
+```{r}
+library(rethinking)
+data(Howell1)
+
+# define the prediction targets
+dat_prediction <- tibble(
+  individual = 1:5,
+  weight = c(46.95, 43.72, 64.78, 32.59, 54.63)
+)
+
+# subset to adults
+adults <- Howell1 %>% 
+  filter(age >= 18) %>% 
+  mutate(weight_c = weight - mean(weight))
+
+# fit the model
+h1 <- rethinking::quap(
+  flist = alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * weight_c,
+    a ~ dnorm(178, 100),
+    b ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  data = adults
+)
+
+rethinking::precis(h1)
+
+# get samples from the posterior for inference  
+h1_posterior <- rethinking::extract.samples(h1)
+
+# get a posterior for each weight in the prediction target  
+h1_prediction <- dat_prediction %>% 
+  mutate(
+    weight_c = weight - mean(adults$weight),
+    posterior = purrr::map(weight_c, ~rnorm(nrow(h1_posterior), mean = h1_posterior$a + h1_posterior$b * .x, sd = h1_posterior$sigma)),
+    estimate = purrr::map_dbl(posterior, mean),
+    hpdi = purrr::map(posterior, rethinking::HPDI),
+    lower89 = purrr::map_dbl(hpdi, ~.x[[1]]),
+    upper89 = purrr::map_dbl(hpdi, ~.x[[2]])
+  )
+
+knitr::kable(
+  select(h1_prediction, individual, weight, estimate, lower89, upper89)
+)
+
+h1_prediction %>% 
+  select(individual, weight, posterior) %>%
+  mutate(posterior = purrr::map(posterior, ~.x[1:300])) %>% 
+  tidyr::unnest() %>% 
+  ggplot(aes(weight, posterior, color = as.factor(individual))) + 
+  geom_point(size = 3, alpha = 0.1) +
+  labs(y = "height", color = "Individual")
+```
+
+### 4H2  
+
+```{r}
+children <- Howell1 %>% 
+  filter(age < 18) %>% 
+  mutate(weight_c = weight - mean(weight))
+
+h2 <- rethinking::quap(
+  flist = alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * weight_c,
+    a ~ dnorm(110, 100),
+    b ~ dnorm(0, 20),
+    sigma ~ dunif(0, 30)
+  ), 
+  data = children
+)
+
+rethinking::precis(h2)
+```
+
+The average height of a !Kung child is between 107 and 109 cm tall. For every 10 kg of increase in weight, we would expect an additional 26 to 28 cm of height. At a given weight, most children are between 8 cm below the average and 9 cm above the average height for that weight.
+
+```{r}
+# sample from posterior over range of childrens weights
+h2_posterior <- rethinking::extract.samples(h2)
+
+h2_dat <- tibble(
+  weight = seq(min(children$weight), max(children$weight), 0.2),
+  weight_c = weight - mean(children$weight),
+  posterior_mu = purrr::map(weight_c, ~h2_posterior$a + h2_posterior$b * .x),
+  posterior = purrr::map(posterior_mu, ~rnorm(10 * nrow(h2_posterior), mean = .x, sd = h2_posterior$sigma)),
+  hpdi_posterior = purrr::map(posterior, rethinking::HPDI),
+  lower89 = purrr::map_dbl(hpdi_posterior, ~.x[[1]]),
+  upper89 = purrr::map_dbl(hpdi_posterior, ~.x[[2]]),
+  hpdi_posterior_mu = purrr::map(posterior_mu, rethinking::HPDI),
+  lower89mu = purrr::map_dbl(hpdi_posterior_mu, ~.x[[1]]),
+  upper89mu = purrr::map_dbl(hpdi_posterior_mu, ~.x[[2]]),
+  estimate = purrr::map_dbl(hpdi_posterior_mu, mean)
+)
+
+ggplot(data = h2_dat, aes(x = weight)) +
+  geom_ribbon(aes(ymin = lower89, ymax = upper89), alpha = 0.1) +
+  geom_smooth(aes(y = estimate, ymin = lower89mu, ymax = upper89mu), stat = "identity") + 
+  geom_point(data = children, aes(y = height), alpha = 0.8)
+```
+
+The model is underfit, in particular it overestimates both the low and high weight children, and underestimates the height for average weights. The curve of the data suggests a log-linear relationship.
+
+### 4H3  
+
+```{r}
+h3 <- rethinking::quap(
+  flist = alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * log2(weight),
+    a ~ dnorm(178, 100),
+    b ~ dnorm(0, 100),
+    sigma ~ dunif(0, 50)
+  ), 
+  data = Howell1
+)
+
+h3_posterior <- rethinking::extract.samples(h3)
+
+interval <- 0.97
+h3_dat <- tibble(
+  weight = seq(min(Howell1$weight), max(Howell1$weight), 0.2),
+  posterior_mu = purrr::map(weight, ~h3_posterior$a + h3_posterior$b * log2(.x)),
+  posterior = purrr::map(posterior_mu, ~rnorm(10 * nrow(h3_posterior), mean = .x, sd = h3_posterior$sigma)),
+  hpdi_posterior = purrr::map(posterior, ~rethinking::HPDI(.x, prob = interval)),
+  lower97 = purrr::map_dbl(hpdi_posterior, ~.x[[1]]),
+  upper97 = purrr::map_dbl(hpdi_posterior, ~.x[[2]]),
+  hpdi_posterior_mu = purrr::map(posterior_mu, rethinking::HPDI),
+  lower97mu = purrr::map_dbl(hpdi_posterior_mu, ~.x[[1]]),
+  upper97mu = purrr::map_dbl(hpdi_posterior_mu, ~.x[[2]]),
+  estimate = purrr::map_dbl(hpdi_posterior_mu, mean)
+)
+
+ggplot(data = h3_dat, aes(x = weight)) +
+  geom_ribbon(aes(ymin = lower97, ymax = upper97), alpha = 0.1) +
+  geom_smooth(aes(y = estimate, ymin = lower97mu, ymax = upper97mu), stat = "identity") + 
+  geom_point(data = Howell1, aes(y = height), alpha = 0.8)
+
+rethinking::precis(h3, prob = interval)
+```
+
+The interpretation on the estimate should be thought of as marginal increase in height, that is for every doubling of weight, we would expect a 32.0 to 33.2 cm increase in height. Note that the prediction variance shrinks a lot relative to the linear model. Now, most heights will be within 4.8 cm below and 5.5 cm above the average height for a given weight.
