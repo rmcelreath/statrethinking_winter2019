@@ -1,0 +1,277 @@
+---
+title: "Chapter 6 Practice"
+author: "Keith Williams"
+date: "1/22/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rethinking)
+ggplot2::theme_set(theme_minimal())
+```
+
+# Easy  
+
+### 6E1  
+
+Small changes in probabilities of events should result in small changes in information entropy. The information entropy of a system should increase as more events become possible. The information entropy should be decomposable, i.e. the entropy of A,X and A,Y should add up to the entropy of A (if X and Y are exhaustive).  
+
+### 6E2  
+
+```{r}
+log_or_zero <- function(nonnegative_number) {
+  if (nonnegative_number == 0) {
+    0
+  } else {
+    log(nonnegative_number)
+  }
+}
+
+entropy <- function(probabilities) {
+  stopifnot(sum(probabilities) == 1.0)
+  log_probabilities <- purrr::map_dbl(probabilities, log_or_zero)
+  as.numeric(-1 * probabilities %*% log_probabilities)
+}
+
+p_coin <- 0.70
+entropy(c(p_coin, 1 - p_coin))
+```
+
+### 6E3  
+
+```{r}
+p_die <- c(0.2, 0.25, 0.25, 0.30)
+entropy(p_die)
+```
+
+### 6E4  
+
+```{r}
+p_round_die <- c(1/3, 1/3, 1/3, 0)
+entropy(p_round_die)
+```
+
+# Medium
+
+### 6M1  
+
+AIC: most general, an estimate of OOS deviance when paramaters are multivariate gaussian with flat priors  
+DIC: more general, handles informative priors  
+WAIC: most general, does not gaussian assumption
+
+### 6M2  
+
+selection: best model  
+averaging: ensemble model predictions  
+
+# Hard  
+
+```{r}
+data(Howell1)
+d <- Howell1 %>% 
+  mutate(age = (age - mean(Howell1$age)) / sd(Howell1$age))
+set.seed(1000)
+i <- sample(1:nrow(d), size = nrow(d) / 2)
+d1 <- d[i,]
+d2 <- d[-i,]
+
+glimpse(d1)
+glimpse(d2)
+
+summary(d1)
+
+m1 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+
+m2 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age + beta2 * age^2,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    beta2 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+
+m3 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age + beta2 * age^2 + beta3 * age^3,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    beta2 ~ dnorm(0, 10),
+    beta3 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+
+m4 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age + beta2 * age^2 + beta3 * age^3 + beta4 * age^4,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    beta2 ~ dnorm(0, 10),
+    beta3 ~ dnorm(0, 10),
+    beta4 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+
+m5 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age + beta2 * age^2 + beta3 * age^3 + beta4 * age^4 + beta5 * age^5,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    beta2 ~ dnorm(0, 10),
+    beta3 ~ dnorm(0, 10),
+    beta4 ~ dnorm(0, 10),
+    beta5 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+
+m6 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- alpha + beta1 * age + beta2 * age^2 + beta3 * age^3 + beta4 * age^4 + beta5 * age^5 + beta6 * age^6,
+    alpha ~ dnorm(137, 40),
+    beta1 ~ dnorm(0, 10),
+    beta2 ~ dnorm(0, 10),
+    beta3 ~ dnorm(0, 10),
+    beta4 ~ dnorm(0, 10),
+    beta5 ~ dnorm(0, 10),
+    beta6 ~ dnorm(0, 10),
+    sigma ~ dunif(0, 50)
+  ),
+  d1
+)
+```
+
+### 6H1
+
+```{r}
+(waic <- compare(m1, m2, m3, m4, m5, m6))
+```
+
+### 6H2  
+
+```{r}
+estimate_mean_height <- function(posterior, age, degree) {
+  # exclude sigma from the posterior, and transform from data.frame into a matrix
+  posterior <- as.matrix(posterior)[,1:(degree + 1)]
+  
+  # create a column vector of bias term + polynomial on age
+  regressors <- c(1, purrr::map_dbl(1:degree, ~age^.x))
+  
+  # inner product of posterior and age
+  as.numeric(posterior %*% regressors)
+}
+
+posterior_mean <- function(model, modelname, dat, interval = 0.97) {
+  # sample from the posterior
+  posterior <- rethinking::extract.samples(model)
+  degree <- length(coef(model)) - 2
+  dat %>% 
+    as_tibble() %>% 
+    mutate(
+      # sample average_height | age
+      posterior_mean = purrr::map(age, ~estimate_mean_height(posterior, .x, degree)),
+      estimate = purrr::map_dbl(posterior_mean, mean),
+      pi = purrr::map(posterior_mean, ~rethinking::PI(.x, prob = interval)),
+      lower = purrr::map_dbl(pi, ~.x[1]),
+      upper = purrr::map_dbl(pi, ~.x[2]),
+      m = modelname
+    ) %>% 
+    select(-c(posterior_mean, pi))
+}
+
+posteriors <- purrr::map2_df(c(m1, m2, m3, m4, m5, m6), c("m1", "m2", "m3", "m4", "m5", "m6"), ~posterior_mean(.x, .y, d1))
+
+ggplot(posteriors, aes(x=age)) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3) +
+  geom_point(aes(y = height), alpha = 0.5, color = "steelblue") + 
+  facet_wrap(~m, scales = "free_y")
+```
+
+### 6H3
+
+```{r}
+# get model weights
+weights <- select(waic, model_weight = weight) %>% 
+  mutate(m = row.names(waic))
+
+inner_join(posteriors, weights, by = "m") %>% 
+  # compute weighted confidence interval on mu
+  mutate(
+    weighted_lower = lower * model_weight,
+    weighted_upper = upper * model_weight,
+    ) %>% 
+  # group by weight to avoid duplicate age, height pairs
+  group_by(age, weight, height) %>% 
+  summarise(
+    lower = sum(weighted_lower),
+    upper = sum(weighted_upper)
+  ) %>%
+  ggplot(aes(x = age)) + 
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3) +
+  geom_point(aes(y = height), alpha = 0.5, color = "steelblue")
+```
+
+### 6H4
+
+```{r}
+regressor_vector <- function(w, degree) {
+  c(1, purrr::map_dbl(1:degree, ~w^.x))
+}
+
+map_estimate <- function(model, model_name, dat) {
+  degree <- length(coef(model)) - 2
+  map_coefficients <- coef(model)[1:(length(coef(model)) - 1)]
+  sigma <- coef(model)['sigma']
+  dat %>% 
+    as_tibble() %>% 
+    mutate(
+      regressor = purrr::map(age, ~regressor_vector(.x, degree)),
+      map_estimate = purrr::map_dbl(regressor, ~as.numeric(map_coefficients %*% .x)),
+      q = dnorm(height, map_estimate, sigma),
+      m = model_name
+    )
+}
+
+(
+oos_deviance <- purrr::map2_df(c(m1, m2, m3, m4, m5, m6), c("m1", "m2", "m3", "m4", "m5", "m6"), ~map_estimate(.x, .y, d2)) %>% 
+  group_by(m) %>%
+  summarise(deviance = sum(q)) %>%
+  mutate(ddeviance = deviance - min(deviance)) %>% 
+  inner_join(mutate(waic, m = row.names(waic)))
+)
+```
+
+### 6H5
+
+```{r}
+ggplot(oos_deviance, aes(ddeviance, dWAIC, color = m)) +
+  geom_point()
+```
+
+Priors are already regularizing, else we would see a postivie correlation in dDeviance and dWAIC
+
