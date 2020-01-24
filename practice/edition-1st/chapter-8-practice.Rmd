@@ -1,0 +1,134 @@
+---
+title: "Chapter 8 Practice"
+author: "Keith Williams"
+date: "1/23/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rethinking)
+ggplot2::theme_set(theme_minimal())
+```
+
+# Notes
+
+```{r}
+## R code 8.1
+num_weeks <- 1e5
+positions <- rep(0,num_weeks)
+current <- 10
+for ( i in 1:num_weeks ) {
+    # record current position
+    positions[i] <- current
+
+    # flip coin to generate proposal
+    proposal <- current + sample( c(-1,1) , size=1 )
+    # now make sure he loops around the archipelago
+    if ( proposal < 1 ) proposal <- 10
+    if ( proposal > 10 ) proposal <- 1
+
+    # move?
+    prob_move <- proposal/current
+    current <- ifelse( runif(1) < prob_move , proposal , current )
+}
+
+king_markov <- tibble(
+  week = 1:num_weeks,
+  position = positions
+)
+
+ggplot(king_markov, aes(position)) + 
+  geom_bar() +
+  labs(title = "counts of visit to each island is proportional to their population")
+
+ggplot(head(king_markov, 1000), aes(week, position)) + 
+  geom_line() +
+  geom_point(alpha = 0.1, size = 4) +
+  labs(title = "Path first 1000 weeks")
+
+# rewrite with any island as a candidate  
+islands <- 1:10
+visited <- numeric(length = num_weeks)
+current <- 10
+for (i in 1:num_weeks) {
+  visited[i] <- current
+  
+  proposal <- sample(islands, 1) * 1
+  prob_move <- proposal / current
+  current <- ifelse(runif(1) < prob_move, proposal, current)
+}
+
+brave_king_markov <- tibble(
+  week = 1:num_weeks,
+  position = visited
+)
+
+ggplot(brave_king_markov, aes(position)) + 
+  geom_bar() +
+  labs(title = "counts of visit to each island is proportional to their population")
+
+ggplot(head(brave_king_markov, 500), aes(week, position)) + 
+  geom_line(alpha = 0.7) +
+  geom_point(alpha = 0.1, size = 4) +
+  labs(title = "Path first 1000 weeks")
+```
+
+```{r}
+data(rugged)
+detach(package:rethinking)
+
+rugged <- rugged %>% 
+  mutate(log_gdp = log(rgdppc_2000))
+
+rugged_complete <- drop_na(rugged, rgdppc_2000)
+
+ggplot(rugged_complete, aes(rugged, log_gdp, color = as.factor(cont_africa))) + 
+  geom_point()
+```
+
+```{r}
+library(brms)
+
+b8_1 <- brm(
+  formula = log_gdp ~ 1 + rugged + cont_africa + rugged:cont_africa,
+  data = rugged_complete,
+  family = gaussian,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 10), class = b),
+    prior(cauchy(0, 2), class = sigma)
+  ),
+  seed = 8
+)
+
+print(b8_1)
+plot(b8_1)
+```
+
+```{r}
+b8_1_par <- brm(
+  formula = log_gdp ~ 1 + rugged + cont_africa + rugged:cont_africa,
+  data = rugged_complete,
+  family = gaussian,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 10), class = b),
+    prior(cauchy(0, 2), class = sigma)
+  ),
+  seed = 8,
+  chains = 4,
+  iter = 2000,
+  cores = 4
+)
+
+plot(b8_1_par)
+post_8_1 <- posterior_samples(b8_1_par)
+pairs(b8_1_par, off_diag_args = list(alpha = 0.1))
+brms::waic(b8_1_par)
+brms::loo(b8_1_par)
+```
+
