@@ -1,3 +1,19 @@
+# Statistical Rethinking
+
+Notes and code for course on Statistical Rethinking
+
+## Resources
+
+### GitHub repositories
+
+1. [Statistical Rethinking course](https://github.com/rmcelreath/statrethinking_winter2019)
+2. Rethinking course [R library](https://github.com/rmcelreath/rethinking/tree/Experimental)
+3. [Python Implementation](https://github.com/rmcelreath/rethinking/tree/Experimental) of homeworks
+4. Other Python based [homework solutions](https://github.com/petrushev/statistical-rethinking)
+5. Statistical Rethinking [website](https://xcelab.net/rm/statistical-rethinking/)
+
+
+
 Statistical Rethinking: A Bayesian Course Using R and Stan
 ===============
 
