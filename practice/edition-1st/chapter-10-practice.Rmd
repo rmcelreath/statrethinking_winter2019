@@ -456,3 +456,327 @@ tibble(
   geom_density()
 ```
 
+# Practice  
+
+## Easy
+
+#### 1  
+
+```{r}
+p <- 0.35
+(log_odds <- log(p / (1 - p)))
+```
+
+#### 2
+
+```{r}
+log_odds <- 3.2
+(p <- exp(log_odds) / (1 + exp(log_odds)))
+```
+
+#### 3  
+
+It has an `exp(1.7)` proportional change to the odds
+
+#### 4  
+
+To handle difference in exposure.  
+
+## Medium  
+
+#### 1  
+
+Because the binomial likelihood accepts an `n` term, i.e. Binom(n, p)
+
+#### 2
+
+The outcome will be `exp(1.7)` times more likely.
+
+#### 3  
+
+Logit transforms the domain to [0, 1], which is the domain of $p$ in a binomial likelihood.
+
+#### 4  
+
+Log transforms the domain to non-negative, which is the domain of $\lambda$ in a poisson likelihood.
+
+#### 5
+
+It would imply that counts cannot exceed 1.  
+
+#### 6  
+
+The binomial distribution has maximum entropy if only two outcomes can happen with constant probability across $n$ trials.  
+The poisson distribution has maximum entropy when only two outcomes can happen with very low probabily across very many trials $n >> 1$. This is consistent with the mean and variance of a binomial likelihood being equal $np \approx np(1 - p)$. The constraints aren't really different, that is a poisson is a special case of the binomial.  
+
+## Hard  
+
+#### 3  
+
+```{r}
+library(MASS)
+data(eagles)
+detach(package:MASS, unload = TRUE)
+?MASS::eagles
+
+eagles <- eagles %>% 
+  mutate(
+    pirate = ifelse(P == "L", "large", "small"),
+    age = ifelse(A == "I", "immature", "adult"),
+    victim = ifelse(V == "L", "large", "small"),
+    p_small = ifelse(P == "L", 0, 1),
+    a_immature = ifelse(A == "I", 1, 0),
+    v_small = ifelse(V == "L", 0, 1)
+  )
+
+main_effects_model <- brm(
+  formula = y | trials(n) ~ 1 + pirate + age + victim,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 5), class = b)
+  ),
+  cores = 4
+)
+
+plot(main_effects_model)
+
+intercept_only <- brm(
+  formula = y | trials(n) ~ 1,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 5), class = Intercept)
+  ),
+  cores = 4
+)
+
+plot(intercept_only)
+
+# would expect quadratic approximation to be poor for size of pirate and victim, but okay for intercept and age
+main_effects_quap <- rethinking::quap(
+  flist = alist(
+    y ~ dbinom(n, p),
+    logit(p) <- alpha + bp * p_small + ba * a_immature + bv * v_small,
+    alpha ~ dnorm(0, 10),
+    bp ~ dnorm(0, 5),
+    ba ~ dnorm(0, 5),
+    bv ~ dnorm(0, 5)
+  ),
+  data = eagles
+)
+
+quap_samples <- rethinking::extract.samples(main_effects_quap, n = 4000)
+mcmc_samples <- posterior_samples(main_effects_model)
+
+bind_cols(quap_samples, mcmc_samples) %>% 
+  select(-lp__) %>% 
+  gather("parameter", "estimate") %>% 
+  mutate(
+    model = ifelse(parameter %in% c("alpha", "bp", "ba", "bv"), "quap", "mcmc"),
+    parameter = case_when(
+      parameter %in% c("alpha", "b_Intercept") ~ "alpha",
+      parameter %in% c("ba", "b_ageimmature") ~ "beta_age_immature",
+      parameter %in% c("bp", "b_piratesmall") ~ "beta_pirate_small",
+      parameter %in% c("bv", "b_victimsmall") ~ "beta_victim_small",
+      TRUE ~ parameter
+    )
+  ) %>% 
+  ggplot(aes(estimate, color = model)) + 
+  geom_density() + 
+  facet_wrap(~parameter, scales = "free")
+```
+
+As expected, the quadratic approximation is a poor fit for the posteriors on size, but okay for the intercept and age.
+
+```{r}
+estimate_p <- function(pir, age, vic, int, bpir, bage, bvic) {
+  inv_logit_scaled(int + bpir * pir + bage * age + bvic * vic)
+}
+
+estimate_p_quap <- function(pir, age, vic, post) {
+  estimate_p(pir, age, vic, post$alpha, post$bp, post$ba, post$bv)
+}
+
+estimate_p_mcmc <- function(pir, age, vic, post) {
+  estimate_p(
+    pir = ifelse(pir == "small", 1, 0),
+    age = ifelse(age == "immature", 1, 0),
+    vic = ifelse(vic == "small", 1, 0),
+    int = post$b_Intercept,
+    bpir = post$b_piratesmall,
+    bage = post$b_ageimmature,
+    bvic = post$b_victimsmall
+  )
+}
+
+
+posterior_eagles <- eagles %>% 
+  mutate(
+    p_quap = purrr::pmap(list(p_small, a_immature, v_small), ~estimate_p_quap(..1, ..2, ..3, quap_samples)),
+    p_mcmc = purrr::pmap(list(pirate, age, victim), ~estimate_p_mcmc(..1, ..2, ..3, mcmc_samples)),
+    l_quap = purrr::map2(n, p_quap, ~rbinom(n = length(.y), size = .x, prob = .y)),
+    l_mcmc = purrr::map2(n, p_mcmc, ~rbinom(n = length(.y), size = .x, prob = .y))
+  ) %>%
+  select(y, n, pirate, age, victim, p_quap, p_mcmc, l_quap, l_mcmc)
+
+posterior_eagles %>% 
+  mutate(pav = paste(pirate, age, victim, sep = "_")) %>% 
+  select(y, n, pav, l_quap, l_mcmc) %>% 
+  unnest(l_quap, l_mcmc) %>%
+  gather("method", "likelihood", l_quap, l_mcmc) %>% 
+  ggplot(aes(likelihood, fill = method)) + 
+  geom_bar(position = "dodge") + 
+  geom_vline(aes(xintercept = y)) +
+  facet_wrap(~pav, scales = "free")
+```
+
+The estimates are systematically misestimating the likelihood of success. This is probably because the model is misspecified, and an interaction term between age and size is necessary. For example, when both the pirate and the victim are large, we overestimate success for adult victims, but underestimate successess for immature victims.  
+
+```{r}
+interaction_effects <- brm(
+  formula = y | trials(n) ~ 1 + pirate + age + victim + pirate:age,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 5), class = b)
+  ),
+  cores = 4
+)
+
+main_effects_model <- add_criterion(main_effects_model, "waic")
+interaction_effects <- add_criterion(interaction_effects, "waic")
+
+loo_compare(main_effects_model, interaction_effects, criterion = "waic")
+
+plot(interaction_effects)
+
+interaction_post <- posterior_samples(interaction_effects)
+estimate_p_interaction <- function(p, a, v, post) {
+  pir = ifelse(p == "small", 1, 0)
+  age = ifelse(a == "immature", 1, 0)
+  vic = ifelse(v == "small", 1, 0)
+  int = post$b_Intercept
+  bpir = post$b_piratesmall
+  bage = post$b_ageimmature
+  bvic = post$b_victimsmall
+  bpirage = post$`b_piratesmall:ageimmature`
+  inv_logit_scaled(int + pir * bpir + age * bage + vic * bvic + pir * age * bpirage)
+}
+
+post_interactions <- eagles %>% 
+  mutate(
+    prob = purrr::pmap(list(pirate, age, victim), ~estimate_p_interaction(..1, ..2, ..3, interaction_post)),
+    lk = purrr::map2(n, prob, ~rbinom(n = length(.y), size = .x, prob = .y)),
+    pav = paste(pirate, age, victim, sep = "_")
+  ) %>% 
+  select(y, n, pav, prob, lk)
+
+post_interactions %>% 
+  unnest(lk) %>% 
+  ggplot(aes(lk)) + 
+  geom_bar() +
+  geom_vline(aes(xintercept = y)) +
+  facet_wrap(~pav, scales = "free")
+
+post_interactions %>% 
+  unnest(prob) %>% 
+  ggplot(aes(prob)) + 
+  geom_density() +
+  geom_vline(aes(xintercept = y / n), color = "red") +
+  facet_wrap(~pav, scales = "free")
+```
+
+Adding the interaction term makes the posterior estimates much more consistent with the data.
+
+```{r}
+interaction_post %>% 
+  mutate(interaction_estimate = inv_logit_scaled(b_Intercept)) %>% 
+  ggplot(aes(interaction_estimate)) +
+  geom_density()
+```
+
+
+#### 4  
+
+```{r}
+library(rethinking)
+data("salamanders")
+detach(package:rethinking, unload = TRUE)
+glimpse(salamanders)
+```
+
+```{r}
+mdl_cover <- brm(
+  formula = SALAMAN ~ 1 + PCTCOVER,
+  family = poisson,
+  data = salamanders,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 1), class = b)
+  ),
+  cores = 4
+)
+
+plot(mdl_cover)
+
+post_cover <- posterior_samples(mdl_cover)
+
+estimate_lambda_cover <- function(cover, post, logage = NULL) {
+  if (is.null(logage)) {
+    exp(post$b_Intercept + cover * post$b_PCTCOVER)
+  } else {
+    exp(post$b_Intercept + cover * post$b_PCTCOVER + logage * post$b_log_forestage)
+  }
+}
+
+s_on_cover <- tibble(pct_cover = seq(1, 99, by = 1)) %>% 
+  mutate(
+    lambda = purrr::map(pct_cover, ~estimate_lambda_cover(.x, post_cover)),
+    s_hat = purrr::map(lambda, ~rpois(n = length(.x), .x)),
+    interval = purrr::map(s_hat, rethinking::HPDI),
+    lower = purrr::map_dbl(interval, ~.x[1]),
+    upper = purrr::map_dbl(interval, ~.x[2])
+  )
+
+ggplot(data = salamanders) + 
+  geom_ribbon(
+    data = s_on_cover,
+    aes(x = pct_cover, ymin = lower, ymax = upper),
+    stat = "identity",
+    alpha = 0.3
+  ) +
+  geom_point(aes(x = PCTCOVER, y = SALAMAN, color = FORESTAGE))
+
+salamanders <- salamanders %>% 
+  mutate(log_forestage = log(FORESTAGE + 1))
+
+mdl_cover_age <- brm(
+  formula = SALAMAN ~ 1 + PCTCOVER + log_forestage,
+  family = poisson,
+  data = salamanders,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 1), class = b)
+  ),
+  cores = 4
+)
+
+plot(mdl_cover_age)
+```
+
+Forest Age is not offering any new information.
+
+```{r}
+post_cover_age <- posterior_samples(mdl_cover_age)
+
+expand.grid(seq(20, 80, 20), 1:6) %>% 
+  magrittr::set_names(c("PCTCOVER", "log_forestage")) %>% 
+  mutate(
+    lambda = purrr::map2(PCTCOVER, log_forestage, ~estimate_lambda_cover(.x, post_cover_age, .y)),
+    s_hat = purrr::map(lambda, ~rpois(n = length(.x), .x))
+  ) %>% glimpse
+```
+
