@@ -79,7 +79,7 @@ ggplot(head(brave_king_markov, 500), aes(week, position)) +
 
 ```{r}
 data(rugged)
-detach(package:rethinking)
+detach(package:rethinking, unload = TRUE)
 
 rugged <- rugged %>% 
   mutate(log_gdp = log(rgdppc_2000))
@@ -130,5 +130,174 @@ post_8_1 <- posterior_samples(b8_1_par)
 pairs(b8_1_par, off_diag_args = list(alpha = 0.1))
 brms::waic(b8_1_par)
 brms::loo(b8_1_par)
+```
+
+# Practice  
+
+## Hard  
+
+#### 8H1  
+
+```{r}
+mp <- rethinking::map2stan(
+  flist = alist(
+    a ~ dnorm(0, 1),
+    b ~ dcauchy(0, 1)
+  ),
+  data = list(y = 1),
+  start = list(a = 0, b = 0),
+  iter = 1e4, warmup = 100, WAIC = FALSE
+)
+
+plot(mp)
+
+# another look at the same sampling:
+rnorm(1e4) %>% hist(main = "Standard Normal")
+rcauchy(1e4) %>% hist(main = "Standard Cauchy")
+```
+
+The cauchy distribution has fat tails, and very large values are possible, though rare.
+
+#### 8H2
+
+```{r}
+library(rethinking)
+data(WaffleDivorce)
+
+d <- WaffleDivorce
+
+# standardize predictor
+d$MedianAgeMarriage.s <- (d$MedianAgeMarriage-mean(d$MedianAgeMarriage))/
+  sd(d$MedianAgeMarriage)
+d$Marriage.s <- (d$Marriage - mean(d$Marriage))/sd(d$Marriage)
+
+m5.1 <- map(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bA * MedianAgeMarriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bA ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) , data = d )
+
+m5.2 <- map(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bR * Marriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bR ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) , data = d )
+
+m5.3 <- map(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bR*Marriage.s + bA*MedianAgeMarriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bR ~ dnorm( 0 , 1 ) ,
+    bA ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) ,
+  data = d )
+
+m5.1.mcmc <- map2stan(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bA * MedianAgeMarriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bA ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) , data = d[,c("Divorce","MedianAgeMarriage.s")] , warmup=500, iter = 4000, chains=3, cores = 3)
+
+m5.2.mcmc <- map2stan(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bR * Marriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bR ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) , data = d[,c("Divorce","Marriage.s")] , warmup=500, iter = 4000, chains=3, cores = 3)
+
+m5.3.mcmc <- map2stan(
+  alist(
+    Divorce ~ dnorm( mu , sigma ) ,
+    mu <- a + bR*Marriage.s + bA*MedianAgeMarriage.s ,
+    a ~ dnorm( 10 , 10 ) ,
+    bR ~ dnorm( 0 , 1 ) ,
+    bA ~ dnorm( 0 , 1 ) ,
+    sigma ~ dunif( 0 , 10 )
+  ) ,
+  data = d[,c("Divorce","Marriage.s","MedianAgeMarriage.s")] , warmup=500, iter = 4000, chains=3, cores = 3)
+
+compare(m5.1, m5.2, m5.3, m5.1.mcmc, m5.2.mcmc, m5.3.mcmc)
+
+detach(package:rethinking, unload = TRUE)
+```
+
+#### 8H3
+
+```{r}
+N <- 100
+height <- rnorm(N, 10, 2)
+leg_prop <- runif(N, 0.4, 0.5)
+leg_left <- leg_prop * height + rnorm(N, 0, 0.02)
+leg_right <- leg_prop * height + rnorm(N, 0, 0.02)
+leg_data <- tibble(height, leg_left, leg_right)
+
+brms::get_prior(formula = height ~ 1 + leg_left + leg_right, family = gaussian(), data = leg_data)
+
+m5.8s <- brm(
+  formula = height ~ 1 + leg_left + leg_right,
+  family = gaussian(),
+  prior = c(
+    prior(normal(10, 100), class = Intercept),
+    prior(normal(2, 10), class = b),
+    prior(cauchy(0, 1), class = sigma)
+  ),
+  data = leg_data,
+  chains = 4, cores = 4
+)
+
+m5.8s2 <- brm(
+  formula = height ~ 1 + leg_left + leg_right,
+  family = gaussian(),
+  prior = c(
+    prior(normal(10, 100), class = Intercept),
+    prior(normal(2, 10), class = b, coef = "leg_left"),
+    prior(normal(2, 10), class = b, coef = "leg_right", lb = 0),
+    prior(cauchy(0, 1), class = sigma)
+  ),
+  data = leg_data,
+  chains = 4, cores = 4
+)
+
+# https://www.rpubs.com/paulessers/Rethinking_8
+```
+
+#### 8H6
+
+```{r}
+# generate a simulated globe
+p_water <- 0.70
+
+num_tosses <- 1e5
+positions <- character(length = num_tosses)
+globe = c("land" = 1 - p_water, "water" = p_water)
+current <- "land"
+for ( i in 1:num_tosses ) {
+    # record current position
+    positions[i] <- current
+
+    # flip coin to generate proposal
+    proposal <- sample(names(globe), size = 1)
+    
+    # move?
+    prob_move <- globe[proposal] / globe[current]
+    current <- ifelse( runif(1) < prob_move , proposal , current )
+}
+ggplot(tibble(position = positions), aes(position)) + 
+  geom_bar()
+
+mean(positions == "water")
 ```
 
