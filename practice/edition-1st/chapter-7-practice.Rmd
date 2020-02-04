@@ -1,0 +1,208 @@
+---
+title: "Chapter 7 Practice"
+author: "Keith Williams"
+date: "1/26/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(brms)
+theme_set(theme_minimal())
+```
+
+# Hard  
+
+### 7H1  
+
+```{r}
+library(rethinking)
+data(tulips)
+data(rugged)
+data(nettle)
+detach(package:rethinking)
+```
+
+```{r}
+tulips_c <- tulips %>% 
+  mutate(
+    water = water - mean(water),
+    shade = shade - mean(shade)
+  )
+
+h71 <- brm(
+  formula = blooms ~ 1 + bed + water + shade + water:shade,
+  family = gaussian,
+  prior = c(
+    prior(normal(130, 100), class = Intercept),
+    prior(normal(0, 100), class = b),
+    prior(normal(0, 50), class = b, coef = water:shade),
+    prior(cauchy(0, 1), class = sigma)
+  ),
+  data = tulips_c,
+  iter = 2000,
+  warmup = 1000,
+  chains = 4,
+  cores = 4
+)
+
+h71
+plot(h71)
+```
+
+### 7H2  
+
+```{r}
+h72 <- brm(
+  formula = blooms ~ 1 + water + shade + water:shade,
+  family = gaussian,
+  prior = c(
+    prior(normal(130, 100), class = Intercept),
+    prior(normal(0, 100), class = b),
+    prior(normal(0, 50), class = b, coef = water:shade),
+    prior(cauchy(0, 1), class = sigma)
+  ),
+  data = tulips_c,
+  iter = 2000,
+  warmup = 1000,
+  chains = 4,
+  cores = 4
+)
+```
+
+```{r}
+tulips_c %>% 
+  mutate(
+    b_intercept = rnorm(nrow(.), 130, 100),
+    b_water = rnorm(nrow(.), 0, 100),
+    b_shade = rnorm(nrow(.), 0, 100),
+    b_ws = rnorm(nrow(.), 0, 50),
+    sigma = sqrt(rcauchy(nrow(.), 0, 1)^2),
+    mu = b_intercept + b_water * water + b_shade * shade + b_ws * water * shade,
+    prior = purrr::map2_dbl(mu, sigma, ~rnorm(1, .x, .y))
+  ) %>% 
+  gather("which", "bloom_size", blooms, prior) %>% 
+  ggplot(aes(bloom_size)) + 
+  geom_density() + 
+  facet_wrap(~which, scales = "free_x") +
+  labs(title = )
+```
+
+```{r}
+waic(h71)
+waic(h72)
+```
+
+WAIC is lower for the model that includes bed (with a smaller variance). Looking at posteriors for bed:
+
+```{r}
+posterior_samples(h71) %>% 
+  mutate(b = b_bedb + b_Intercept, c = b_bedc + b_Intercept) %>% 
+  select(a = b_Intercept, b, c) %>% 
+  gather("bed", "posterior") %>% 
+  ggplot(aes(posterior, fill = bed)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Predicted Average bloom size at average water and shade")
+```
+
+It appears that bed A had much lower predicted average bloom size than B or C. This could be due to pests in bed A that weren't present in beds B or C. Controlling for the effect of being in bed A, gives better estimates for the effect of water and shade.  
+
+### 7H3  
+
+```{r}
+with_seychelles <- rugged %>% 
+  mutate(log_gdp = log(rgdppc_2000)) %>% 
+  select(log_gdp, rugged, cont_africa, country) %>% 
+  drop_na()
+
+no_seychelles <- with_seychelles %>% 
+  filter(country != "Seychelles")
+
+nrow(no_seychelles) == nrow(with_seychelles) - 1
+
+m_seychelles <- brm(
+  formula = log_gdp ~ 1 + rugged + cont_africa + rugged:cont_africa,
+  prior = c(prior(normal(8, 100), class = Intercept),
+                prior(normal(0, 1), class = b),
+                prior(cauchy(0, 1), class = sigma)),
+  data = with_seychelles,
+  iter = 2000, warmup = 1000, chains = 4, cores = 4
+)
+
+m_no_seychelles <- update(m_seychelles, newdata = no_seychelles)
+```
+
+```{r}
+m_seychelles <- add_criterion(m_seychelles, c("loo", "waic"))
+m_no_seychelles <- add_criterion(m_no_seychelles, c("loo", "waic"))
+m_seychelles$loo
+m_no_seychelles$loo
+m_seychelles$waic
+m_no_seychelles$waic
+```
+
+Excluding Seychelles has created a slightly better model fit. Compare predictions:
+
+```{r}
+africa_posterior <- function(rugged, africa, post) {
+  post$b_Intercept + post$b_rugged * rugged + post$b_cont_africa * africa + post$`b_rugged:cont_africa` * rugged * africa
+}
+add_posterior <- function(dat, mdl) {
+  post <- posterior_samples(mdl)
+  dat %>% 
+    mutate(posterior = purrr::map2(rugged, cont_africa, ~africa_posterior(.x, .y, post)))
+}
+
+pal <- RColorBrewer::brewer.pal(3, "Accent")
+
+add_posterior(with_seychelles, m_seychelles) %>% 
+  inner_join(add_posterior(with_seychelles, m_no_seychelles), by = c("log_gdp", "rugged", "cont_africa", "country")) %>% 
+  mutate(
+    quantileswith = purrr::map(posterior.x, ~quantile(.x, c(0.055, 0.945))),
+    quantileswithout = purrr::map(posterior.y, ~quantile(.x, c(0.055, 0.945))),
+    lowerwith = purrr::map_dbl(quantileswith, ~.x[1]),
+    upperwith = purrr::map_dbl(quantileswith, ~.x[2]),
+    lowerwithout = purrr::map_dbl(quantileswithout, ~.x[1]),
+    upperwithout = purrr::map_dbl(quantileswithout, ~.x[2]),
+    estimatewith = purrr::map_dbl(posterior.x, mean),
+    estimatewithout = purrr::map_dbl(posterior.y, mean)
+  ) %>% 
+  ggplot(aes(x = rugged)) +
+  geom_smooth(
+    aes(y = estimatewith, ymin = lowerwith, ymax = upperwith),
+    stat = "identity",
+    color = pal[1], fill = pal[1],
+    alpha = 0.2
+  ) +
+  geom_smooth(
+    aes(y = estimatewithout, ymin = lowerwithout, ymax = upperwithout),
+    stat = "identity",
+    color = pal[2], fill = pal[2],
+    alpha = 0.2
+  ) +
+  geom_point(aes(y = log_gdp)) +
+  facet_wrap(~cont_africa)
+```
+
+As expected, the estimate of ruggedness on GDP does not change for countries not in Africa, and the effect appears more dramatic when including Seychelles. The posterior without Seychelles is much more likely to be 0 or negative when excluding Seychelles.
+
+```{r}
+extract_posterior_rugged_africa <- function(mdl) {
+  posterior_samples(mdl) %>% 
+  mutate(posterior = b_rugged + `b_rugged:cont_africa`) %>% 
+  magrittr::use_series(posterior)
+}
+
+tibble(
+  with = extract_posterior_rugged_africa(m_seychelles),
+  without = extract_posterior_rugged_africa(m_no_seychelles)
+) %>% 
+  gather("model", "effect") %>% 
+  ggplot(aes(effect, fill = model)) + 
+  geom_density(alpha = 0.3) +
+  labs(title = "Estimated effect of ruggedness on log GDP with and without Seychelles")
+```
+

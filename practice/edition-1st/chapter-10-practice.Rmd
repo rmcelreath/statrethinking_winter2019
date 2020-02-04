@@ -1,0 +1,782 @@
+---
+title: "Chapter 10"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
+# Notes
+
+```{r}
+library(rethinking)
+data(chimpanzees)
+detach(package:rethinking, unload = TRUE)
+library(brms)
+glimpse(chimpanzees)
+```
+
+```{r}
+b10.1 <- brm(
+    data = chimpanzees, family = binomial,
+    pulled_left | trials(1) ~ 1,
+    prior(normal(0, 10), class = Intercept),
+    seed = 10
+  )
+
+fixef(b10.1) %>% 
+  round(digits = 2)
+
+fixef(b10.1) %>% 
+  inv_logit_scaled()
+```
+
+```{r}
+b10.2 <-
+  brm(data = chimpanzees, family = binomial,
+      pulled_left | trials(1) ~ 1 + prosoc_left,
+      prior = c(prior(normal(0, 10), class = Intercept),
+                prior(normal(0, 10), class = b)),
+      seed = 10)
+
+b10.3 <-
+  update(b10.2,
+         newdata = chimpanzees,
+         formula = pulled_left | trials(1) ~ 1 + prosoc_left + condition:prosoc_left)
+```
+
+```{r}
+b10.1 <- add_criterion(b10.1, "waic")
+b10.2 <- add_criterion(b10.2, "waic")
+b10.3 <- add_criterion(b10.3, "waic")
+
+(waic_chimp <- loo_compare(b10.1, b10.2, b10.3, criterion = "waic"))
+```
+
+```{r}
+cbind(
+  waic_diff = waic_chimp[, 1] * -2,
+  se        = waic_chimp[, 2] *  2
+) %>% 
+  round(digits = 2)
+```
+
+```{r}
+waic_chimp %>%
+  data.frame() %>% 
+  rownames_to_column(var = "model") %>% 
+  ggplot() +
+    geom_pointrange(aes(x = model,#x = reorder(model, -waic),
+                        y = waic,
+                        ymin = waic - se_waic,
+                        ymax = waic + se_waic,
+                        color = model),
+                    shape = 16) +
+    coord_flip() +
+    labs(x = "Model", y = "Deviance", title = "WAIC") +
+    theme(axis.ticks.y    = element_blank(),
+          legend.position = "none")
+```
+
+```{r}
+model_weights(b10.1, b10.2, b10.3, 
+              weights = "waic")
+
+print(b10.3)
+
+fixef(b10.3)[2] %>% exp()
+```
+
+```{r}
+ppa <- 
+  pp_average(b10.1, b10.2, b10.3,
+             weights = "waic",
+             method = "fitted") %>%
+  as_tibble() %>% 
+  bind_cols(b10.3$data) %>% 
+  distinct(Estimate, Q2.5, Q97.5, condition, prosoc_left) %>% 
+  mutate(x_axis = str_c(prosoc_left, condition, sep = "/")) %>%
+  mutate(x_axis = factor(x_axis, levels = c("0/0", "1/0", "0/1", "1/1"))) %>% 
+  rename(pulled_left = Estimate)
+
+# the empirically-based summaries
+d_plot <-
+  chimpanzees %>%
+  group_by(actor, condition, prosoc_left) %>%
+  summarise(pulled_left = mean(pulled_left)) %>%
+  mutate(x_axis = str_c(prosoc_left, condition, sep = "/")) %>%
+  mutate(x_axis = factor(x_axis, levels = c("0/0", "1/0", "0/1", "1/1")))
+
+# the plot
+ppa %>% 
+  ggplot(aes(x = x_axis)) +
+  geom_smooth(aes(y = pulled_left, ymin = Q2.5, ymax = Q97.5, group = 0),
+              stat = "identity",
+              color = "black", 
+              alpha = 0.3, size = 1/2) +
+  geom_line(data = d_plot,
+            aes(y = pulled_left, group = actor),
+            color = "steelblue",
+            size = 1/3) +
+  scale_x_discrete(expand = c(.03, .03)) +
+  coord_cartesian(ylim = 0:1) +
+  labs(x = "prosoc_left/condition",
+       y = "proportion pulled left") +
+  theme(axis.ticks.x = element_blank())
+```
+
+```{r}
+bayesplot::mcmc_pairs(x = posterior_samples(b10.3),
+           pars = c("b_Intercept", "b_prosoc_left", "b_prosoc_left:condition"),
+           off_diag_args = list(size = 1/10, alpha = 1/6),
+           diag_fun = "dens")
+```
+
+```{r}
+b10.4 <-brm(
+  data = chimpanzees, 
+  family = binomial,
+  formula = pulled_left | trials(1) ~ 0 + factor(actor) + prosoc_left + condition:prosoc_left,
+  prior = prior(normal(0, 10), class = b),
+  iter = 2500, warmup = 500, chains = 2, cores = 2,
+  control = list(adapt_delta = 0.9), seed = 10
+)
+```
+
+```{r}
+distinct(chimpanzees, actor)
+print(b10.4)
+```
+
+```{r}
+post_b10.4 <- posterior_samples(b10.4)
+glimpse(post_b10.4)
+```
+
+```{r}
+# figure 10.3
+ggplot(post_b10.4, aes(x = b_factoractor2)) +
+  geom_density() +
+  geom_vline(xintercept = 4, alpha = 0.5, color = "steelblue") +
+  labs(
+    x = "log-odds for $\\Beta_actor2$",
+    title    = "Actor 2's large and uncertain intercept",
+    subtitle = "Once your log-odds are above ~4 it's all\npretty much a probability of 1."
+  )
+```
+
+```{r}
+# figure 10.4
+
+# subset the `d_plot` data
+d_plot_4 <-
+  d_plot %>%
+  filter(actor %in% c(3, 5:7)) %>%
+  ungroup() %>% 
+  mutate(actor = str_c("actor ", actor))
+
+# compute the model-implied estimates with `fitted()` and wrangle
+f <-
+  fitted(b10.4) %>% 
+  as_tibble() %>% 
+  bind_cols(b10.4$data) %>% 
+  filter(actor %in% c(3, 5:7)) %>% 
+  distinct(Estimate, Q2.5, Q97.5, condition, prosoc_left, actor) %>% 
+  select(actor, everything()) %>% 
+  mutate(actor  = str_c("actor ", actor),
+         x_axis = str_c(prosoc_left, condition, sep = "/")) %>%
+  mutate(x_axis = factor(x_axis, levels = c("0/0", "1/0", "0/1", "1/1"))) %>%
+  rename(pulled_left = Estimate)
+
+# plot
+f %>% 
+  ggplot(aes(x = x_axis, y = pulled_left, group = actor)) +
+  geom_smooth(aes(ymin = Q2.5, ymax = Q97.5),
+              stat = "identity",
+              color = "black", 
+              alpha = 0.3, size = 1/2) +
+  geom_line(data = d_plot_4,
+            size = 1.25,
+            color = "steelblue") +
+  scale_x_discrete(expand = c(.03, .03)) +
+  coord_cartesian(ylim = 0:1) +
+  labs(x = "prosoc_left/condition",
+       y = "proportion pulled left") +
+  theme(axis.ticks.x     = element_blank(),
+  ) +
+  facet_wrap(~actor)
+```
+
+```{r}
+d_aggregated <- chimpanzees %>% 
+  group_by(actor, condition, prosoc_left) %>% 
+  summarise(
+    pulled_left = sum(pulled_left),
+    n_trials = n()
+    )
+
+d_aggregated
+```
+
+```{r}
+b10.5 <-brm(
+  data = d_aggregated, 
+  family = binomial,
+  formula = pulled_left | trials(n_trials) ~ 1 + prosoc_left + condition:prosoc_left,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 10), class = b)
+  ),
+  iter = 2500, warmup = 500, cores = 2, chains = 2, 
+  seed = 10
+)
+
+fixef(b10.5) %>% round(2)
+```
+
+```{r}
+# getting wacky, let's try beta prior on p
+beta_binomial2 <- custom_family(
+  "beta_binomial2", dpars = c("mu", "phi"),
+  links = c("logit", "log"), lb = c(NA, 0),
+  type = "int", vars = "trials[n]"
+)
+
+stan_funs <- "
+  real beta_binomial2_lpmf(int y, real mu, real phi, int T) {
+    return beta_binomial_lpmf(y | T, mu * phi, (1 - mu) * phi);
+  }
+  int beta_binomial2_rng(real mu, real phi, int T) {
+    return beta_binomial_rng(T, mu * phi, (1 - mu) * phi);
+  }
+"
+
+stanvars <- stanvar(scode = stan_funs, block = "functions")
+
+b10_beta <- brm(
+  data = d_aggregated,
+  family = beta_binomial2,
+  stanvars = stanvars,
+  formula = pulled_left | trials(n_trials) ~ 1 + prosoc_left + condition:prosoc_left,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 10), class = b),
+    prior(cauchy(0, 2), class = phi)
+  ),
+  iter = 2500, warmup = 500, cores = 4, chains = 4,
+  seed = 10
+)
+
+b10_beta
+plot(b10_beta)
+
+b10.5
+plot(b10.5)
+
+fixef(b10.5)
+fixef(b10_beta)
+```
+
+
+```{r}
+# create posterior distributions for probability to pull-left for both methods and compare
+post_b10.5 <- posterior_samples(b10.5, subset = 1:500)
+post_b10_beta <- posterior_samples(b10_beta, subset = 1:500)
+
+compute_mu <- function(prosoc_left, condition, posterior) {
+  posterior$b_Intercept + prosoc_left * posterior$b_prosoc_left + prosoc_left * condition * posterior$`b_prosoc_left:condition`
+}
+
+left_means <- d_aggregated %>% 
+  mutate(treatment = paste0(prosoc_left, condition)) %>% 
+  group_by(treatment) %>% 
+  summarise(p_hat = sum(pulled_left) / sum(n_trials))
+
+tibble(
+  prosoc_left = c(0, 1, 0, 1),
+  condition = c(0, 1, 1, 0)
+) %>% 
+  mutate(
+    mu_binom = purrr::map2(prosoc_left, condition, ~compute_mu(.x, .y, post_b10.5)),
+    p_binom = purrr::map(mu_binom, ~inv_logit_scaled(.x)),
+    mu_beta = purrr::map2(prosoc_left, condition, ~compute_mu(.x, .y, post_b10_beta)),
+    alpha_beta = purrr::map(mu_beta, ~inv_logit_scaled(.x) * post_b10_beta$phi),
+    beta_beta = purrr::map(mu_beta, ~(1 - inv_logit_scaled(.x)) * post_b10_beta$phi),
+    p_beta = purrr::map2(alpha_beta, beta_beta, ~qbeta(p = 0.5, .x, .y)),
+    treatment = paste0(prosoc_left, condition)
+  ) %>% 
+  select(prosoc_left, treatment, p_binom, p_beta) %>% 
+  unnest(p_binom, p_beta) %>% 
+  gather("likelihood", "p_hat", p_binom, p_beta) %>% 
+  ggplot(aes(treatment, p_hat)) + 
+  geom_point(aes(color = as.factor(prosoc_left)), alpha = 0.1, size = 2) +
+  geom_point(data = left_means, shape = 5, size = 3) +
+  facet_wrap(~likelihood) +
+  coord_flip()
+```
+
+```{r}
+expose_functions(b10_beta, vectorize = TRUE)
+log_lik_beta_binomial2 <- function(i, draws) {
+  mu <- draws$dpars$mu[, i]
+  phi <- draws$dpars$phi
+  trials <- draws$data$trial[i]
+  y <- draws$data$Y[i]
+  beta_binomial2_lpmf(y, mu, phi, trials)
+}
+
+loo(b10.5, b10_beta)
+```
+
+```{r}
+predict_beta_binomial2 <- function(i, draws, ...) {
+  mu <- draws$dpars$mu[, i]
+  phi <- draws$dpars$phi
+  trials <- draws$data$trial[i]
+  beta_binomial2_rng(mu, phi, trials)
+}
+
+n_samples <- 50
+pp_check(b10.5, nsamples = n_samples) +
+  labs(x = "pulled left out of 18")
+pp_check(b10_beta, nsamples = n_samples) +
+  labs(x = "pulled left out of 18")
+```
+
+```{r}
+# add actor to the models
+with_actor_formula <- formula(pulled_left | trials(n_trials) ~ 0 + factor(actor) + prosoc_left + condition:prosoc_left)
+
+b10.5_actor <- update(b10.5, formula = with_actor_formula, newdata = d_aggregated)
+b10_beta_actor <- brm(
+  data = d_aggregated,
+  family = beta_binomial2,
+  stanvars = stanvars,
+  formula = with_actor_formula,
+  prior = c(
+    prior(normal(0, 10), class = b),
+    prior(exponential(1), class = phi)
+  ),
+  iter = 2500, warmup = 500, cores = 4, chains = 4,
+  seed = 10
+)
+```
+
+```{r}
+plot(b10.5_actor)
+plot(b10_beta_actor)
+```
+
+```{r}
+# create posterior distributions for probability to pull-left for both methods and compare
+post_b10.5_actor <- posterior_samples(b10.5_actor, subset = 1:500)
+post_b10_beta_actor <- posterior_samples(b10_beta_actor, subset = 1:500)
+
+compute_mu_actor <- function(prosoc_left, condition, actor, posterior) {
+  intercept <- posterior[[paste0('b_factoractor', actor)]]
+  intercept + prosoc_left * posterior$b_prosoc_left + prosoc_left * condition * posterior$`b_prosoc_left:condition`
+}
+
+left_means_actor <- d_aggregated %>% 
+  mutate(
+    treatment = paste0(prosoc_left, condition),
+    p_hat = pulled_left / n_trials
+  )
+
+d_aggregated %>% 
+  mutate(
+    mu_binom = purrr::pmap(list(prosoc_left, condition, actor), ~compute_mu_actor(..1, ..2, ..3, post_b10.5_actor)),
+    p_binom = purrr::map(mu_binom, ~inv_logit_scaled(.x)),
+    mu_beta = purrr::pmap(list(prosoc_left, condition, actor), ~compute_mu_actor(..1, ..2, ..3, post_b10_beta_actor)),
+    alpha_betabinom = purrr::map(mu_beta, ~inv_logit_scaled(.x) * post_b10_beta_actor$phi),
+    beta_betabinom = purrr::map(mu_beta, ~(1 - inv_logit_scaled(.x)) * post_b10_beta_actor$phi),
+    p_betabinom = purrr::map2(alpha_betabinom, beta_betabinom, ~qbeta(p = 0.5, .x, .y)),
+    treatment = paste0(prosoc_left, condition),
+    p_beta = purrr::map2(pulled_left, n_trials, ~rbeta(500, 1 + .x, 1 + .y - .x))
+  ) %>% 
+  select(prosoc_left, treatment, actor, p_binom, p_betabinom, p_beta) %>% 
+  unnest(p_binom, p_betabinom, p_beta) %>% 
+  gather("likelihood", "p_hat", p_binom, p_betabinom, p_beta) %>% 
+  ggplot(aes(treatment, p_hat)) + 
+  geom_point(aes(color = as.factor(prosoc_left)), alpha = 0.1, size = 2) +
+  geom_point(data = left_means_actor, shape = 5, size = 3) +
+  facet_grid(actor~likelihood) +
+  coord_flip()
+```
+
+```{r}
+pp_check(b10.5_actor, nsamples = n_samples)
+pp_check(b10_beta_actor, nsamples = n_samples)
+```
+
+```{r}
+# compare intercept only logit model to beta distribution
+library(rethinking)
+data(UCBAdmissions)
+admissions <- as_tibble(UCBAdmissions)
+detach(package:rethinking, unload = TRUE)
+```
+
+```{r}
+beta_admissions <- admissions %>% 
+  group_by(Admit) %>% 
+  summarise(n = sum(n))
+
+admit <- admissions %>% 
+  spread(Admit, n) %>% 
+  mutate(n_applications = Admitted + Rejected)
+
+model_admissions <- brm(
+  formula = Admitted | trials(n_applications) ~ 1,
+  data = admit,
+  family = binomial,
+  prior = c(
+    prior(normal(0, 10), class = Intercept)
+  )
+)
+
+plot(model_admissions)
+
+beta_samples <- rbeta(4000, shape1 = beta_admissions$n[1] + 1, shape2 = beta_admissions$n[2] + 1)
+logit_samples <- posterior_samples(model_admissions, subset = 1:4000) %>% 
+  magrittr::use_series(b_Intercept) %>% 
+  inv_logit_scaled()
+
+tibble(
+  beta = beta_samples,
+  logit = logit_samples
+) %>% 
+  gather("method", "samples") %>% 
+  ggplot(aes(samples, color = method)) + 
+  geom_density()
+```
+
+# Practice  
+
+## Easy
+
+#### 1  
+
+```{r}
+p <- 0.35
+(log_odds <- log(p / (1 - p)))
+```
+
+#### 2
+
+```{r}
+log_odds <- 3.2
+(p <- exp(log_odds) / (1 + exp(log_odds)))
+```
+
+#### 3  
+
+It has an `exp(1.7)` proportional change to the odds
+
+#### 4  
+
+To handle difference in exposure.  
+
+## Medium  
+
+#### 1  
+
+Because the binomial likelihood accepts an `n` term, i.e. Binom(n, p)
+
+#### 2
+
+The outcome will be `exp(1.7)` times more likely.
+
+#### 3  
+
+Logit transforms the domain to [0, 1], which is the domain of $p$ in a binomial likelihood.
+
+#### 4  
+
+Log transforms the domain to non-negative, which is the domain of $\lambda$ in a poisson likelihood.
+
+#### 5
+
+It would imply that counts cannot exceed 1.  
+
+#### 6  
+
+The binomial distribution has maximum entropy if only two outcomes can happen with constant probability across $n$ trials.  
+The poisson distribution has maximum entropy when only two outcomes can happen with very low probabily across very many trials $n >> 1$. This is consistent with the mean and variance of a binomial likelihood being equal $np \approx np(1 - p)$. The constraints aren't really different, that is a poisson is a special case of the binomial.  
+
+## Hard  
+
+#### 3  
+
+```{r}
+library(MASS)
+data(eagles)
+detach(package:MASS, unload = TRUE)
+?MASS::eagles
+
+eagles <- eagles %>% 
+  mutate(
+    pirate = ifelse(P == "L", "large", "small"),
+    age = ifelse(A == "I", "immature", "adult"),
+    victim = ifelse(V == "L", "large", "small"),
+    p_small = ifelse(P == "L", 0, 1),
+    a_immature = ifelse(A == "I", 1, 0),
+    v_small = ifelse(V == "L", 0, 1)
+  )
+
+main_effects_model <- brm(
+  formula = y | trials(n) ~ 1 + pirate + age + victim,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 5), class = b)
+  ),
+  cores = 4
+)
+
+plot(main_effects_model)
+
+intercept_only <- brm(
+  formula = y | trials(n) ~ 1,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 5), class = Intercept)
+  ),
+  cores = 4
+)
+
+plot(intercept_only)
+
+# would expect quadratic approximation to be poor for size of pirate and victim, but okay for intercept and age
+main_effects_quap <- rethinking::quap(
+  flist = alist(
+    y ~ dbinom(n, p),
+    logit(p) <- alpha + bp * p_small + ba * a_immature + bv * v_small,
+    alpha ~ dnorm(0, 10),
+    bp ~ dnorm(0, 5),
+    ba ~ dnorm(0, 5),
+    bv ~ dnorm(0, 5)
+  ),
+  data = eagles
+)
+
+quap_samples <- rethinking::extract.samples(main_effects_quap, n = 4000)
+mcmc_samples <- posterior_samples(main_effects_model)
+
+bind_cols(quap_samples, mcmc_samples) %>% 
+  select(-lp__) %>% 
+  gather("parameter", "estimate") %>% 
+  mutate(
+    model = ifelse(parameter %in% c("alpha", "bp", "ba", "bv"), "quap", "mcmc"),
+    parameter = case_when(
+      parameter %in% c("alpha", "b_Intercept") ~ "alpha",
+      parameter %in% c("ba", "b_ageimmature") ~ "beta_age_immature",
+      parameter %in% c("bp", "b_piratesmall") ~ "beta_pirate_small",
+      parameter %in% c("bv", "b_victimsmall") ~ "beta_victim_small",
+      TRUE ~ parameter
+    )
+  ) %>% 
+  ggplot(aes(estimate, color = model)) + 
+  geom_density() + 
+  facet_wrap(~parameter, scales = "free")
+```
+
+As expected, the quadratic approximation is a poor fit for the posteriors on size, but okay for the intercept and age.
+
+```{r}
+estimate_p <- function(pir, age, vic, int, bpir, bage, bvic) {
+  inv_logit_scaled(int + bpir * pir + bage * age + bvic * vic)
+}
+
+estimate_p_quap <- function(pir, age, vic, post) {
+  estimate_p(pir, age, vic, post$alpha, post$bp, post$ba, post$bv)
+}
+
+estimate_p_mcmc <- function(pir, age, vic, post) {
+  estimate_p(
+    pir = ifelse(pir == "small", 1, 0),
+    age = ifelse(age == "immature", 1, 0),
+    vic = ifelse(vic == "small", 1, 0),
+    int = post$b_Intercept,
+    bpir = post$b_piratesmall,
+    bage = post$b_ageimmature,
+    bvic = post$b_victimsmall
+  )
+}
+
+
+posterior_eagles <- eagles %>% 
+  mutate(
+    p_quap = purrr::pmap(list(p_small, a_immature, v_small), ~estimate_p_quap(..1, ..2, ..3, quap_samples)),
+    p_mcmc = purrr::pmap(list(pirate, age, victim), ~estimate_p_mcmc(..1, ..2, ..3, mcmc_samples)),
+    l_quap = purrr::map2(n, p_quap, ~rbinom(n = length(.y), size = .x, prob = .y)),
+    l_mcmc = purrr::map2(n, p_mcmc, ~rbinom(n = length(.y), size = .x, prob = .y))
+  ) %>%
+  select(y, n, pirate, age, victim, p_quap, p_mcmc, l_quap, l_mcmc)
+
+posterior_eagles %>% 
+  mutate(pav = paste(pirate, age, victim, sep = "_")) %>% 
+  select(y, n, pav, l_quap, l_mcmc) %>% 
+  unnest(l_quap, l_mcmc) %>%
+  gather("method", "likelihood", l_quap, l_mcmc) %>% 
+  ggplot(aes(likelihood, fill = method)) + 
+  geom_bar(position = "dodge") + 
+  geom_vline(aes(xintercept = y)) +
+  facet_wrap(~pav, scales = "free")
+```
+
+The estimates are systematically misestimating the likelihood of success. This is probably because the model is misspecified, and an interaction term between age and size is necessary. For example, when both the pirate and the victim are large, we overestimate success for adult victims, but underestimate successess for immature victims.  
+
+```{r}
+interaction_effects <- brm(
+  formula = y | trials(n) ~ 1 + pirate + age + victim + pirate:age,
+  family = binomial,
+  data = eagles,
+  prior = c(
+    prior(normal(0, 10), class = Intercept),
+    prior(normal(0, 5), class = b)
+  ),
+  cores = 4
+)
+
+main_effects_model <- add_criterion(main_effects_model, "waic")
+interaction_effects <- add_criterion(interaction_effects, "waic")
+
+loo_compare(main_effects_model, interaction_effects, criterion = "waic")
+
+plot(interaction_effects)
+
+interaction_post <- posterior_samples(interaction_effects)
+estimate_p_interaction <- function(p, a, v, post) {
+  pir = ifelse(p == "small", 1, 0)
+  age = ifelse(a == "immature", 1, 0)
+  vic = ifelse(v == "small", 1, 0)
+  int = post$b_Intercept
+  bpir = post$b_piratesmall
+  bage = post$b_ageimmature
+  bvic = post$b_victimsmall
+  bpirage = post$`b_piratesmall:ageimmature`
+  inv_logit_scaled(int + pir * bpir + age * bage + vic * bvic + pir * age * bpirage)
+}
+
+post_interactions <- eagles %>% 
+  mutate(
+    prob = purrr::pmap(list(pirate, age, victim), ~estimate_p_interaction(..1, ..2, ..3, interaction_post)),
+    lk = purrr::map2(n, prob, ~rbinom(n = length(.y), size = .x, prob = .y)),
+    pav = paste(pirate, age, victim, sep = "_")
+  ) %>% 
+  select(y, n, pav, prob, lk)
+
+post_interactions %>% 
+  unnest(lk) %>% 
+  ggplot(aes(lk)) + 
+  geom_bar() +
+  geom_vline(aes(xintercept = y)) +
+  facet_wrap(~pav, scales = "free")
+
+post_interactions %>% 
+  unnest(prob) %>% 
+  ggplot(aes(prob)) + 
+  geom_density() +
+  geom_vline(aes(xintercept = y / n), color = "red") +
+  facet_wrap(~pav, scales = "free")
+```
+
+Adding the interaction term makes the posterior estimates much more consistent with the data.
+
+```{r}
+interaction_post %>% 
+  mutate(interaction_estimate = inv_logit_scaled(b_Intercept)) %>% 
+  ggplot(aes(interaction_estimate)) +
+  geom_density()
+```
+
+
+#### 4  
+
+```{r}
+library(rethinking)
+data("salamanders")
+detach(package:rethinking, unload = TRUE)
+glimpse(salamanders)
+```
+
+```{r}
+mdl_cover <- brm(
+  formula = SALAMAN ~ 1 + PCTCOVER,
+  family = poisson,
+  data = salamanders,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 1), class = b)
+  ),
+  cores = 4
+)
+
+plot(mdl_cover)
+
+post_cover <- posterior_samples(mdl_cover)
+
+estimate_lambda_cover <- function(cover, post, logage = NULL) {
+  if (is.null(logage)) {
+    exp(post$b_Intercept + cover * post$b_PCTCOVER)
+  } else {
+    exp(post$b_Intercept + cover * post$b_PCTCOVER + logage * post$b_log_forestage)
+  }
+}
+
+s_on_cover <- tibble(pct_cover = seq(1, 99, by = 1)) %>% 
+  mutate(
+    lambda = purrr::map(pct_cover, ~estimate_lambda_cover(.x, post_cover)),
+    s_hat = purrr::map(lambda, ~rpois(n = length(.x), .x)),
+    interval = purrr::map(s_hat, rethinking::HPDI),
+    lower = purrr::map_dbl(interval, ~.x[1]),
+    upper = purrr::map_dbl(interval, ~.x[2])
+  )
+
+ggplot(data = salamanders) + 
+  geom_ribbon(
+    data = s_on_cover,
+    aes(x = pct_cover, ymin = lower, ymax = upper),
+    stat = "identity",
+    alpha = 0.3
+  ) +
+  geom_point(aes(x = PCTCOVER, y = SALAMAN, color = FORESTAGE))
+
+salamanders <- salamanders %>% 
+  mutate(log_forestage = log(FORESTAGE + 1))
+
+mdl_cover_age <- brm(
+  formula = SALAMAN ~ 1 + PCTCOVER + log_forestage,
+  family = poisson,
+  data = salamanders,
+  prior = c(
+    prior(normal(0, 100), class = Intercept),
+    prior(normal(0, 1), class = b)
+  ),
+  cores = 4
+)
+
+plot(mdl_cover_age)
+```
+
+Forest Age is not offering any new information.
+
+```{r}
+post_cover_age <- posterior_samples(mdl_cover_age)
+
+expand.grid(seq(20, 80, 20), 1:6) %>% 
+  magrittr::set_names(c("PCTCOVER", "log_forestage")) %>% 
+  mutate(
+    lambda = purrr::map2(PCTCOVER, log_forestage, ~estimate_lambda_cover(.x, post_cover_age, .y)),
+    s_hat = purrr::map(lambda, ~rpois(n = length(.x), .x))
+  ) %>% glimpse
+```
+
