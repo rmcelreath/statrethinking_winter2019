@@ -1,0 +1,147 @@
+---
+title: "Chapter 11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rethinking)
+theme_set(theme_minimal())
+```
+
+# Notes
+
+```{r}
+data(Trolley)
+detach(package:rethinking, unload = TRUE)
+library(brms)
+```
+
+```{r}
+# define the start values
+inits <- list(`Intercept[1]` = -2,
+              `Intercept[2]` = -1,
+              `Intercept[3]` = 0,
+              `Intercept[4]` = 1,
+              `Intercept[5]` = 2,
+              `Intercept[6]` = 2.5)
+
+inits_list <- list(inits, inits)
+
+b11.1 <- 
+  brm(data = Trolley, family = cumulative,
+      response ~ 1,
+      prior(normal(0, 10), class = Intercept),
+      iter = 4000, warmup = 1000, cores = 2, chains = 2,
+      inits = inits_list,  # here we add our start values
+      seed = 11)
+```
+
+```{r}
+post_b11.1 <- posterior_samples(b11.1) %>% 
+  select(starts_with("b_")) %>% 
+  mutate_all(inv_logit_scaled)
+
+post_b11.1 %>% 
+  gather("intercept", "probability") %>% 
+  ggplot(aes(probability, color = intercept)) + 
+  geom_density()
+```
+
+```{r}
+# look at the actual posterior probability for each score
+post_probs_b11.1 <- post_b11.1 %>% 
+  mutate(
+    p1 = `b_Intercept[1]`,
+    p2 = `b_Intercept[2]` - `b_Intercept[1]`,
+    p3 = `b_Intercept[3]` - `b_Intercept[2]`,
+    p4 = `b_Intercept[4]` - `b_Intercept[3]`,
+    p5 = `b_Intercept[5]` - `b_Intercept[4]`,
+    p6 = `b_Intercept[6]` - `b_Intercept[5]`,
+    p7 = 1 - `b_Intercept[6]`
+  ) %>% 
+  select(starts_with("p"))
+  
+post_probs_b11.1 %>% 
+  gather("intercept", "probability") %>% 
+  ggplot(aes(probability, color = intercept)) + 
+  geom_density()
+```
+
+```{r}
+# expectd value
+expected_values_b11.1 <- post_probs_b11.1 %>% 
+  mutate(
+    e1 = p1,
+    e2 = p2 * 2,
+    e3 = p3 * 3,
+    e4 = p4 * 4,
+    e5 = p5 * 5,
+    e6 = p6 * 6,
+    e7 = p7 * 7
+  ) %>% 
+  select(starts_with("e"))
+
+expected_values_b11.1 %>% 
+  gather("intercept", "value") %>% 
+  ggplot(aes(value, color = intercept)) + 
+  geom_density()
+```
+
+```{r}
+expected_values_b11.1 %>% 
+  mutate(expected_value = e1 + e2 + e3 + e4 + e5 + e6 + e7) %>% 
+  ggplot() + 
+  geom_density(aes(expected_value)) +
+  geom_vline(xintercept = mean(Trolley$response), color = "red")
+
+ggplot(Trolley, aes(response)) +
+  geom_bar()
+```
+
+Doesn't seem flat enough, given the data. Maybe expected value is nonsense for ordinal data.
+
+```{r}
+inits_predictors <- list(
+  `Intercept[1]` = -1.9,
+  `Intercept[2]` = -1.2,
+  `Intercept[3]` = -0.7,
+  `Intercept[4]` =  0.2,
+  `Intercept[5]` =  0.9,
+  `Intercept[6]` =  1.8,
+  action         =  0,
+  intention      =  0,
+  contact        =  0
+)
+
+b11.2 <- 
+  brm(data = Trolley, family = cumulative,
+      response ~ 1 + action + intention + contact,
+      prior = c(prior(normal(0, 10), class = Intercept),
+                prior(normal(0, 10), class = b)),
+      iter = 2000, warmup = 1000, cores = 2, chains = 2,
+      inits = list(inits_predictors, inits_predictors),
+      seed = 11)
+```
+
+```{r}
+posterior_samples(b11.2, subset = 1:100) %>% 
+  gather("intercept", "alpha", `b_Intercept[1]`:`b_Intercept[6]`) %>%
+  mutate(
+    a0i0c0 = alpha,
+    a0i1c0 = alpha - b_intention,
+    a1i0c1 = alpha - b_action - b_contact,
+    a1i1c1 = alpha - b_action - b_contact - b_intention
+  ) %>% 
+  mutate(grp = row_number()) %>% 
+  select(grp, intercept, starts_with("a0"), starts_with("a1")) %>% 
+  mutate_at(3:6, inv_logit_scaled) %>% 
+  gather("predictor", "cumulative_probability", a0i0c0:a1i1c1) %>%
+  # ggplot(aes(x = cumulative_probability, color = predictor)) + 
+  # geom_density() +
+  ggplot(aes(x = predictor, y = cumulative_probability, group = grp)) + 
+  geom_line(alpha = 0.1)
+  # facet_wrap(~intercept, scales = "free_y")
+```
+
