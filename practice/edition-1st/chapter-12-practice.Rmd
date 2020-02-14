@@ -1,0 +1,102 @@
+---
+title: "Chapter 12"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+theme_set(theme_minimal())
+library(brms)
+```
+
+# Notes
+
+```{r}
+data(reedfrogs, package = "rethinking")
+reedfrogs %>% 
+  mutate(
+    size = forcats::fct_relevel(size, c("small", "big"))
+  ) %>% 
+  ggplot(aes(size, propsurv, color = pred)) + 
+  geom_point(size = 4, alpha = 0.5)
+```
+
+Interecept only model from previous concepts.
+
+```{r}
+reedfrogs <- reedfrogs %>% 
+  mutate(tank = as.character(row_number()))
+
+b12.1 <- brm(
+  data = reedfrogs, 
+  family = binomial,
+  formula = surv | trials(density) ~ 0 + factor(tank),
+  prior = prior(normal(0, 3), class = b),
+  iter = 2000, warmup = 500, chains = 2, cores = 2,
+  seed = 12
+)
+```
+
+```{r}
+intercept_only_estimates <- fixef(b12.1) %>% 
+  as_tibble(rownames = "tank") %>% 
+  mutate_at(.vars = 2:5, inv_logit_scaled) %>% 
+  mutate(tank = stringr::str_extract(tank, "[0-9]+"))
+
+left_join(reedfrogs, intercept_only_estimates) %>% 
+  ggplot(aes(as.integer(tank))) +
+    geom_errorbar(aes(ymin = `Q2.5`, ymax = `Q97.5`, color = size)) +
+    geom_point(aes(y = Estimate, color = size), shape = 10) +
+    geom_point(aes(y = propsurv))
+```
+
+Black dots are observed proportions, colored circles with error bars are estimates from the intercept only model. Differences in estimate and actuals come from the prior.  
+
+```{r}
+b12.2 <- brm(
+  data = reedfrogs, 
+  family = binomial,
+  formula = surv | trials(density) ~ 1 + (1 | tank),
+  prior = c(
+    prior(normal(0, 1), class = Intercept),
+    prior(cauchy(0, 1), class = sd)
+    ),
+  iter = 4000, warmup = 1000, chains = 2, cores = 2,
+  seed = 12
+)
+```
+
+Observe the adaptive shrinkage that the multilevel model provides.
+
+```{r}
+multilevel_estimates <- coef(b12.2, robust = T)$tank %>% 
+  as_tibble(rownames = "tank") %>% 
+  select(tank, multilevel = Estimate.Intercept) %>% 
+  mutate(multilevel = inv_logit_scaled(multilevel))
+
+alpha_prior <- inv_logit_scaled(fixef(b12.2)$Estimate)
+global_mean <- sum(reedfrogs$surv) / sum(reedfrogs$density)
+
+inner_join(reedfrogs, multilevel_estimates) %>% 
+  inner_join(intercept_only_estimates, by = "tank") %>% 
+  select(tank, multilevel, intercept_only = Estimate, observed = propsurv) %>% 
+  gather("estimate", "survival_rate", 2:4) %>% 
+  ggplot(aes(as.integer(tank), survival_rate, color = estimate)) + 
+  geom_point(alpha = 0.5, size = 3) +
+  geom_hline(yintercept = alpha_prior)
+  # geom_hline(yintercept = global_mean)
+
+ggplot(reedfrogs, aes(as.integer(tank), density)) + 
+  geom_bar(stat = "identity") +
+  labs(x = "tank", y = "count of tadpoles")
+```
+
+Intercept only does a little shrinkage for small counts (left side), but nothing for larger counts (right side). The multilevel estimates adaptively shrink with distance from the population median and inversely with the count of observations in each group.  
+
+```{r}
+posterior_samples(b12.2) %>% glimpse
+```
+
