@@ -46,7 +46,7 @@ There are a lot of very useful resources for bayesian statistical modelling out 
 
 Finally, since github sometimes has issues rendering `Jupyter` notebooks, you can find them via nbviewer in the following links. In the repo, you can find them in the `/notebooks/pymc3` folder.
 
-[Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
+[Week 1 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethink_course_in_pymc3/blob/master/notebooks/pymc3/rethink_stats_pymc3_w01.ipynb): The Golem of Prague and Garden of Forking Data
 
 [Week 2 notebook](https://nbviewer.jupyter.org/github/gbosquechacon/statrethinking_winter2019/blob/master/notebooks/pymc3/rethink_stats_pymc3_w02.ipynb): Geocentric Models and Wiggly Orbits
 
